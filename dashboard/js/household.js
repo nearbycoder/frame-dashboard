@@ -69,10 +69,13 @@
   }
   function emit(domain) { App.emit('household:' + domain); App.emit('household', domain); }
   H.hasPending = function () { return names.some(function (name) { return Object.keys(H.pending[name]).length > 0; }); };
-  H.refresh = function (domain, week) {
+  function cancelReads(domain) { (reads[domain] || []).slice().forEach(function (xhr) { if (xhr.abort) xhr.abort(); }); }
+  H.refresh = function (domain, week, force) {
     if (week !== undefined && H.params[domain] !== week) { H.params[domain] = week; H.states[domain].generation++; }
     if (Object.keys(H.pending[domain]).length) return Promise.resolve();
-    var state = H.states[domain], generation = state.generation, signature = domain + ':' + (H.params[domain] || '') + ':' + generation;
+    var state = H.states[domain];
+    if (force) { state.generation++; cancelReads(domain); }
+    var generation = state.generation, signature = domain + ':' + (H.params[domain] || '') + ':' + generation;
     if (inflight[signature]) return inflight[signature];
     state.loading = true; if (!state.data || state.error) emit(domain); var started = mono();
     var task = request('GET', domain).then(function (data) {
@@ -88,7 +91,7 @@
     H.pending[domain][key] = action; state.generation++; state.loading = false;
     // Invalidating a poll is not enough: cancel its network work so a queued edit
     // cannot sit behind a discarded full-list download in the runtime's lock.
-    (reads[domain] || []).slice().forEach(function (xhr) { if (xhr.abort) xhr.abort(); });
+    cancelReads(domain);
     emit(domain);
     var task = (queues[domain] || Promise.resolve()).then(function () {
       var started = mono(), requestWeek = H.params[domain];

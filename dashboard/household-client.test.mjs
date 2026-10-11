@@ -46,3 +46,9 @@ test('an edit aborts stale polls and a compact confirmed removal retains the usu
  const removal=f.H.write('shopping','remove',{id:'item'},'item');assert.equal(aborted,true);await tick();assert.equal(f.requests[2].url,'/api/household/shopping/remove');
  f.requests[2].status=200;f.requests[2].responseText=JSON.stringify({data:{items:[],updatedAt:'2026-10-11T00:00:00Z'},partial:true,controlKey:'test-control'});f.requests[2].onload();await Promise.all([poll,removal]);assert.equal(f.DATA.groceries.length,0);assert.equal(f.DATA.usuals.length,1);assert.equal(f.H.states.shopping.error,null);assert.equal(f.H.hasPending(),false);
 });
+test('manual refresh replaces an in-flight poll and only the newest snapshot updates Shopping',async()=>{
+ const f=fixture();const old=f.H.refresh('shopping');let aborted=false;f.requests[0].abort=()=>{aborted=true;f.requests[0].onabort();};const fresh=f.H.refresh('shopping',undefined,true);assert.equal(aborted,true);assert.equal(f.requests.length,2);
+ f.requests[1].reply({items:[{id:'fresh',name:'New item',quantity:1,checked:false,category:'Other'}],usualItems:[]});await Promise.all([old,fresh]);assert.equal(f.DATA.groceries[0].id,'fresh');assert.equal(f.H.states.shopping.error,null);
+ // Even a late callback from the discarded request cannot restore the old list.
+ f.requests[0].reply({items:[],usualItems:[]});await tick();assert.equal(f.DATA.groceries[0].id,'fresh');
+});

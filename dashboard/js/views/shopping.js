@@ -2,7 +2,7 @@
 (function () {
  'use strict';
  var H = App.household, D = window.DATA;
- var V = { el: null, query: '', checked: false, picker: null, search: '', category: '', page: 0, catalog: [], listSignature: null };
+ var V = { el: null, query: '', checked: false, picker: null, search: '', category: '', page: 0, catalog: [], listSignature: null, refreshing: false };
  var pageSize = 18;
  function error(e) { App.toast(App.esc(e.message), { tone: 'error', ms: 6000 }); }
  function usual(id) { return D.usuals.filter(function (u) { return u.id === id; })[0]; }
@@ -88,6 +88,10 @@
    });
   }
   V.el.querySelector('.s-count').textContent = H.states.shopping.data ? D.groceries.filter(function (g) { return !g.checked; }).length + ' items to get' : '';
+  var refresh = V.el.querySelector('[data-shopping-refresh]');
+  refresh.textContent = V.refreshing ? 'Refreshing…' : 'Refresh';
+  refresh.disabled = V.refreshing || Object.keys(H.pending.shopping).length > 0;
+  refresh.setAttribute('aria-busy', String(V.refreshing));
   V.el.querySelector('[data-checked]').textContent = V.checked ? 'Show unfinished' : 'Checked items';
   V.el.querySelector('[data-open-usuals]').disabled = !H.states.shopping.data || !D.usuals.length;
   V.el.querySelector('.usual-catalog-count').textContent = D.usuals.length + ' usual items';
@@ -97,7 +101,7 @@
  }
  function render() {
   if (!V.el.firstChild) {
-   V.el.innerHTML = '<div class="shop"><header class="s-head"><div><div class="label">Shared shopping list</div><h1 class="serif">Shopping</h1></div><div class="s-count"></div><button class="btn" data-checked>Checked items</button></header><div class="s-list live-shopping-list"><div class="live-shopping-status"></div><div class="live-shopping-items"></div></div><aside class="s-side"><form class="s-add live-shopping-add"><label class="s-input-wrap">' + App.icon('plus', 26) + '<input class="s-input" maxlength="240" placeholder="Add an item…" required autocomplete="off"></label><button class="btn btn--solid" type="submit">Add item</button></form><button class="usual-open" data-open-usuals>' + App.icon('cart', 40) + '<b>Add usual items</b><span class="usual-catalog-count"></span>' + App.icon('plus', 28) + '</button></aside></div>';
+   V.el.innerHTML = '<div class="shop"><header class="s-head"><div><div class="label">Shared shopping list</div><h1 class="serif">Shopping</h1></div><div class="s-count"></div><button class="btn" data-shopping-refresh aria-label="Refresh shopping list">Refresh</button><button class="btn" data-checked>Checked items</button></header><div class="s-list live-shopping-list"><div class="live-shopping-status"></div><div class="live-shopping-items"></div></div><aside class="s-side"><form class="s-add live-shopping-add"><label class="s-input-wrap">' + App.icon('plus', 26) + '<input class="s-input" maxlength="240" placeholder="Add an item…" required autocomplete="off"></label><button class="btn btn--solid" type="submit">Add item</button></form><button class="usual-open" data-open-usuals>' + App.icon('cart', 40) + '<b>Add usual items</b><span class="usual-catalog-count"></span>' + App.icon('plus', 28) + '</button></aside></div>';
    var input = V.el.querySelector('input'); input.value = V.query;
    input.oninput = function () { V.query = input.value; };
    V.el.addEventListener('error', imageError, true);
@@ -108,6 +112,17 @@
   paint();
  }
  function click(e) { var b = e.target.closest('button'); if (!b || b.disabled) return;
+  if (b.hasAttribute('data-shopping-refresh')) {
+   V.refreshing = true; paint();
+   var task = H.refresh('shopping', undefined, true), generation = H.states.shopping.generation;
+   task.then(function () {
+    V.refreshing = false; paint();
+    if (generation !== H.states.shopping.generation) return; // An edit cancelled the read.
+    if (H.states.shopping.error) return error({ message: H.states.shopping.error });
+    App.toast('Shopping refreshed', { icon: 'cart' });
+   });
+   return;
+  }
   if (b.hasAttribute('data-open-usuals')) return openPicker();
   if (b.hasAttribute('data-checked')) { V.checked = !V.checked; return paint(); }
   var id = b.dataset.remove || b.dataset.check || b.dataset.id, g = D.groceries.filter(function (g) { return g.id === id; })[0]; if (!g) return;

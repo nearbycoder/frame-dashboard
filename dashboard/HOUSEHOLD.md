@@ -16,7 +16,7 @@ The backend accepts only the named read operations and five write operations abo
 
 ## Shopping photos and quick adds
 
-Shopping shows product thumbnails beside list items. **Add usual items** opens a full-page picker with search, category filters, and 18 products per page. The trash button beside each shopping row removes it from the list after Ring confirms the change.
+Shopping shows product thumbnails beside list items. The header’s **Refresh** button starts a fresh Ring read for both the list and usual-item catalog, replacing an older in-flight poll. It shows Refreshing during the request and confirms completion, while preserving the selected list view, scroll position, and unfinished input. Refresh is temporarily unavailable while shopping edits are saving. **Add usual items** opens a full-page picker with search, category filters, and 18 products per page. The trash button beside each shopping row removes it from the list after Ring confirms the change.
 
 Tap different products without waiting for earlier saves; affected tiles show Saving, then the quantity confirmed by Ring. Confirmed additions stay in place until the picker closes so readback cannot shift a product under a finger. Use the list's quantity controls to add more of an item already selected.
 
