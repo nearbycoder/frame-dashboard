@@ -14,8 +14,14 @@ Calendar refreshes every five minutes, weather every fifteen minutes, and time/c
 
 The backend accepts only the named read operations and four write operations above. Writes require the exact page origin and an ephemeral control key, use bounded validated JSON, serialize within each collection, and reread Ring state before returning. Uncertain writes are not retried automatically. The client invalidates old polling when a mutation starts, disables only the affected controls, and retains Shopping input during refresh. Dashboard update navigation waits for outstanding household writes as well as light changes.
 
+## Shopping photos and quick adds
+
+Shopping shows product thumbnails beside list items. **Add usual items** opens a full-page picker with search, category filters, and 18 products per page. Tap different products without waiting for earlier saves; affected tiles show Saving, then the quantity confirmed by Ring. Confirmed additions stay in place until the picker closes so readback cannot shift a product under a finger. Use the list's quantity controls to add more of an item already selected.
+
+Photos use a bounded same-origin `/product-image` proxy, because Android 6's certificate store cannot reliably fetch modern CDN assets. Only HTTPS JPEG/PNG/WebP product paths on `i5.walmartimages.com` are accepted; redirects are rejected, dimensions are canonicalized to 240×240, downloads are limited to 1 MiB and three concurrent requests, and the browser caches photos for six hours. No Ring credential is sent to the image CDN. Missing or failed photos show a cart placeholder. Product images and household data are not bundled in public releases.
+
 ## Updating an existing standalone frame
 
-This feature needs the **new native `frame-runtime-armv7`** from the live-household release as well as its dashboard bundle. The web updater alone cannot replace a native runtime. Back up the old root-owned binary, install the verified new binary atomically, and let the kiosk's existing service restart it. Keep the private `ringos.authorization`, verified release cache, bootstrap, and APK in place. The kiosk APK itself does not change.
+This feature needs the **new native `frame-runtime-armv7`** from **v1.1.1 or newer** (live household endpoints plus product photos) as well as its dashboard bundle. The web updater alone cannot replace a native runtime. Back up the old root-owned binary, install the verified new binary atomically, and let the kiosk's existing service restart it. Keep the private `ringos.authorization`, verified release cache, bootstrap, and APK in place. The kiosk APK itself does not change.
 
 The prior dashboard remains usable if the new native runtime fails. Restore the backed-up binary and restart its service before applying a web bundle that needs these endpoints.

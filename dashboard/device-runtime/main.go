@@ -53,6 +53,7 @@ func secureClient(dns string, redirects bool) *http.Client {
 	}}
 }
 func handler(s *releases, b *bridge, client *http.Client) http.Handler {
+	products := productImages(client)
 	imageLimit := make(chan struct{}, 4)
 	imageRE := regexp.MustCompile(`^/demo-images/([a-zA-Z0-9_-]{1,64})/([0-9]{1,4})/([0-9]{1,4})$`)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -62,6 +63,10 @@ func handler(s *releases, b *bridge, client *http.Client) http.Handler {
 			return
 		}
 		w.Header().Set("X-Content-Type-Options", "nosniff")
+		if r.URL.Path == "/product-image" {
+			products.ServeHTTP(w, r)
+			return
+		}
 		if strings.HasPrefix(r.URL.Path, "/api/household/") {
 			b.handleHousehold(w, r)
 			return

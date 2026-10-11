@@ -1,6 +1,7 @@
 // Local dashboard + bounded demo-image proxy for legacy Android frames.
 // Upstream TLS is checked by Node; the frame receives assets over Wi-Fi or its USB localhost link.
 import http from 'node:http';
+import { createProductImages } from './product-images.mjs';
 import { readFile, stat, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -18,6 +19,7 @@ const cache = new Map();
 const pending = new Map();
 const lights = createRingBridge({ authorization: keyringAuthorization() });
 const household = createHouseholdBridge({ rpc: lights.rpc });
+const products = createProductImages();
 let cacheBytes = 0;
 const CACHE_LIMIT = 8 * 1024 * 1024;
 const IMAGE_LIMIT = 4 * 1024 * 1024;
@@ -79,6 +81,7 @@ async function image(key) {
 const server = http.createServer(async (request, response) => {
   try {
     const url = new URL(request.url, 'http://localhost');
+    if (await products(request, response, url)) return;
     if (await lights.handle(request, response, url)) return;
     if (await household.handle(request, response, url)) return;
     if (!['GET', 'HEAD'].includes(request.method)) {
