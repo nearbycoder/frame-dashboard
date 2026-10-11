@@ -8,6 +8,11 @@
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/icon-192.png">
   <script>
+    // Restore before styles load to avoid a bright flash on updates.
+    window.HQ_THEME = 'light';
+    try { if (localStorage.getItem('homehq.theme') === 'dark') window.HQ_THEME = 'dark'; } catch (_) {}
+    document.documentElement.dataset.theme = window.HQ_THEME;
+    document.querySelector('meta[name="theme-color"]').content = window.HQ_THEME === 'dark' ? '#17191D' : '#F2EEE6';
     // Low-memory frames skip remote variable fonts and hidden-page preloading.
     var lite = location.search.match(/[?&]lite=([01])(?:&|$)/);
     window.HQ_LITE = lite ? lite[1] === '1' : /Android [1-6]\b/.test(navigator.userAgent);
@@ -31,6 +36,7 @@
   <link rel="stylesheet" href="css/views/lights.css">
   <link rel="stylesheet" href="css/views/agents.css">
   <link rel="stylesheet" href="css/views/ambient.css">
+  <link rel="stylesheet" href="css/dark.css">
 </head>
 <body>
   <div class="stage" id="stage" data-mode="day">

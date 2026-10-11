@@ -46,3 +46,17 @@
   --ease: cubic-bezier(.2, .8, .2, 1);
   --spring: cubic-bezier(.34, 1.56, .64, 1);
 }
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #17191D;
+  --paper-2: #2A2D33;
+  --card: #22252B;
+  --ink: #F2EEE6;
+  --ink-rgb: 242 238 230;
+  --ink-2: #D4D0C8;
+  --mute: #AAA69E;
+  --line: #454850;
+  --ok: #44C99A;
+  --c-ink: #17191D;
+}

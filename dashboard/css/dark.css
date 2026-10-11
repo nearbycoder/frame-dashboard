@@ -1,0 +1,38 @@
+/* Adapt dashboard surfaces without recolouring photos or actual light swatches. */
+[data-theme="dark"] .demo-panel,
+[data-theme="dark"] .hc-climate,
+[data-theme="dark"] .s-add,
+[data-theme="dark"] .ag-sum { background: #101216; color: #F2EEE6; }
+[data-theme="dark"] .demo-grid button.is-on,
+[data-theme="dark"] .demo-grid button:active,
+[data-theme="dark"] .seg--glass button.is-on,
+[data-theme="dark"] .tk-btn--solid { color: #111111; }
+[data-theme="dark"] .tk-btn--light.tk-btn--solid { color: var(--alert); }
+[data-theme="dark"] .toast { color: var(--paper); }
+[data-theme="dark"] .toast--error { color: #FFFFFF; }
+[data-theme="dark"] .toast-undo { background: rgba(0, 0, 0, .12); }
+[data-theme="dark"] .toast--error .toast-undo { background: rgba(255, 255, 255, .14); }
+[data-theme="dark"] .pill--soon,
+[data-theme="dark"] .ev.is-family,
+[data-theme="dark"] .banner-btn--solid { color: var(--paper); }
+[data-theme="dark"] .banner { color: #111111; }
+[data-theme="dark"] .banner--ink { color: var(--paper); }
+[data-theme="dark"] .banner--ink .banner-btn { background: rgba(0, 0, 0, .1); }
+[data-theme="dark"] .banner--ink .banner-btn--solid { background: var(--paper); color: var(--ink); }
+[data-theme="dark"] .s-input-wrap { background: var(--card); }
+[data-theme="dark"] .polaroid figcaption { color: #111111; }
+[data-theme="dark"] .sheet-x { background: rgba(255, 255, 255, .08); }
+[data-theme="dark"] .sheet--cam .sheet-x { background: rgba(255, 255, 255, .2); }
+[data-theme="dark"] .light-line-fill { background: #574321; }
+[data-theme="dark"] .light-color i,
+[data-theme="dark"] .light-color-options button i { border-color: rgba(255, 255, 255, .3); }
+[data-theme="dark"] .real-lights-status { color: #FFB28D; }
+[data-theme="dark"] .h-st-row.is-warn,
+[data-theme="dark"] .ag-status.is-warn,
+[data-theme="dark"] .ag-pace.is-over,
+[data-theme="dark"] .ag-incident { color: #FFC45C; }
+[data-theme="dark"] .ag-incident--hot { color: #FF817A; }
+[data-theme="dark"] .stage[data-mode="nightdash"] > .rail,
+[data-theme="dark"] .stage[data-mode="nightdash"] > .views {
+  filter: grayscale(1) sepia(1) saturate(5) hue-rotate(-38deg) brightness(.62);
+}

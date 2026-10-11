@@ -12,6 +12,8 @@ See [dashboard/device-runtime/README.md](dashboard/device-runtime/README.md) for
 
 ## Develop on a computer
 
+Press and hold the sidebar clock to open the mode controls. **Light** and **Dark** change the interactive dashboard theme; the choice is remembered across page reloads and updates. **Ambient** and **Night** remain available without changing the saved theme.
+
 Requires Node.js 24 and npm. From `dashboard/`:
 
 ```sh

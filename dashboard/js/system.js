@@ -17,7 +17,7 @@
     el.innerHTML = html;
     el.classList.add('is-open');
     App.closeSheet();
-    if (App.mode !== 'day') App.setMode('day');
+    if (App.mode !== 'day') App.resumeDashboard();
     return el;
   }
   function closeTakeover() {
@@ -126,6 +126,8 @@
       '<div class="demo-sec"><div class="label label--light">Time of day · now ' + App.fmt.time(t) + '</div><div class="demo-grid">' +
       '<button data-time="7:10">7:10 AM</button><button data-time="15:18">3:18 PM</button><button data-time="19:45">7:45 PM</button><button data-time="23:40">11:40 PM</button><button data-time="real">Real time</button></div></div>' +
       '<div class="demo-sec"><div class="label label--light">Modes</div><div class="demo-grid">' +
+      '<button data-mode="day" aria-pressed="' + (App.theme === 'light') + '" class="' + (App.theme === 'light' ? 'is-on' : '') + '">Light</button>' +
+      '<button data-mode="dark" aria-pressed="' + (App.theme === 'dark') + '" class="' + (App.theme === 'dark' ? 'is-on' : '') + '">Dark</button>' +
       '<button data-mode="ambient">Ambient</button><button data-mode="night">Night</button><button data-fastidle>' + (App.idle.home < 60 ? 'Idle: fast ✓' : 'Idle: fast') + '</button></div></div>' +
       '<div class="demo-sec"><div class="label label--light">Alerts</div><div class="demo-grid">' +
       '<button data-alert="doorbell">Doorbell</button><button data-alert="leak">Water leak</button><button data-alert="garage">Garage open</button><button data-alert="package">Package</button></div></div>' +

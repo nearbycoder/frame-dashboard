@@ -4,6 +4,7 @@
   var D = window.DATA;
   var App = window.App = { state: D, views: {}, current: null, mode: 'day', calMode: 'normal' };
   App.lite = !!window.HQ_LITE;
+  App.theme = window.HQ_THEME === 'dark' ? 'dark' : 'light';
   var $ = App.$ = function (s, r) { return (r || document).querySelector(s); };
   App.$$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
 
@@ -283,13 +284,22 @@
     el.addEventListener('pointercancel', cancel);
   };
 
-  // ------------------------------------------------------------ modes: day / ambient / night
+  // Dashboard themes persist independently of temporary Ambient/Night screens.
   App.setMode = function (m) {
+    if (['day', 'dark', 'ambient', 'night', 'nightdash'].indexOf(m) < 0) return;
+    if (m === 'day' || m === 'dark') {
+      App.theme = m === 'dark' ? 'dark' : 'light';
+      document.documentElement.dataset.theme = App.theme;
+      $('meta[name="theme-color"]').content = App.theme === 'dark' ? '#17191D' : '#F2EEE6';
+      try { localStorage.setItem('homehq.theme', App.theme); } catch (_) {}
+      m = 'day';
+    }
     var stage = $('#stage');
     App.mode = m;
     stage.dataset.mode = m;
     App.emit('mode', m);
   };
+  App.resumeDashboard = function () { App.setMode(App.theme === 'dark' ? 'dark' : 'day'); };
 
   // ------------------------------------------------------------ idle
   App.idle = { home: 60, ambient: App.lite ? Infinity : 120 };
