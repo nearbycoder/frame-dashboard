@@ -1,8 +1,7 @@
 /* Adapt dashboard surfaces without recolouring photos or actual light swatches. */
 [data-theme="dark"] .demo-panel,
 [data-theme="dark"] .hc-climate,
-[data-theme="dark"] .s-add,
-[data-theme="dark"] .ag-sum { background: #101216; color: #F2EEE6; }
+[data-theme="dark"] .s-add { background: #101216; color: #F2EEE6; }
 [data-theme="dark"] .demo-grid button.is-on,
 [data-theme="dark"] .demo-grid button:active,
 [data-theme="dark"] .seg--glass button.is-on,
@@ -27,11 +26,7 @@
 [data-theme="dark"] .light-color i,
 [data-theme="dark"] .light-color-options button i { border-color: rgba(255, 255, 255, .3); }
 [data-theme="dark"] .real-lights-status { color: #FFB28D; }
-[data-theme="dark"] .h-st-row.is-warn,
-[data-theme="dark"] .ag-status.is-warn,
-[data-theme="dark"] .ag-pace.is-over,
-[data-theme="dark"] .ag-incident { color: #FFC45C; }
-[data-theme="dark"] .ag-incident--hot { color: #FF817A; }
+[data-theme="dark"] .h-st-row.is-warn { color: #FFC45C; }
 [data-theme="dark"] .stage[data-mode="nightdash"] > .rail,
 [data-theme="dark"] .stage[data-mode="nightdash"] > .views {
   filter: grayscale(1) sepia(1) saturate(5) hue-rotate(-38deg) brightness(.62);
