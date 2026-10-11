@@ -2,7 +2,9 @@
 (function () {
   'use strict';
   var meta = document.querySelector('meta[name="dashboard-build"]');
-  var U = App.updates = { current: meta ? meta.content : null, currentTag: null, available: null, applying: false, error: null };
+  var commitMeta = document.querySelector('meta[name="dashboard-commit"]');
+  var commit = commitMeta && /^[a-f0-9]{40}$/.test(commitMeta.content) ? commitMeta.content : null;
+  var U = App.updates = { current: meta ? meta.content : null, currentCommit: commit, currentTag: null, available: null, applying: false, error: null };
   var checking = null, dismissVersion = null, bannerClose = null, pointers = {}, sheet = null;
   function get(url, binary) {
     return new Promise(function (resolve, reject) {
@@ -26,7 +28,9 @@
     if (button) button.querySelector('.update-dot').hidden = !U.available;
     if (sheet) {
       sheet.querySelector('[data-update-status]').textContent = U.applying ? 'Preparing update…' : U.error || (U.available ? 'A new dashboard is ready' + (U.available.tag ? ': ' + U.available.tag : '.') : checking ? 'Checking for updates…' : 'Your dashboard is up to date.');
-      sheet.querySelector('[data-update-version]').textContent = U.current ? 'Installed dashboard: ' + (U.currentTag ? U.currentTag + ' · ' : '') + U.current.slice(0, 8) : '';
+      var installed = sheet.querySelector('[data-update-version]');
+      installed.textContent = U.current ? 'Installed dashboard: ' + (U.currentTag ? U.currentTag + ' · ' : '') + (U.currentCommit ? 'commit ' + U.currentCommit.slice(0, 7) : 'build ' + U.current.slice(0, 8)) : '';
+      installed.title = U.currentCommit || '';
       sheet.querySelector('[data-update-apply]').hidden = !U.available;
       sheet.querySelector('[data-update-apply]').disabled = U.applying;
       sheet.querySelector('[data-update-check]').disabled = U.applying || !!checking;

@@ -30,6 +30,8 @@ Open `http://localhost:4173/?lite=1#home`. This optional development server uses
 
 See [dashboard/UPDATES.md](dashboard/UPDATES.md) for publishing, caching and rollback.
 
+The Updates screen identifies the installed release by its short source Git commit SHA, matching GitHub. The full SHA is embedded in the release's HTML at build time, so checking for a newer release does not change the installed commit shown. Older bundles without this metadata show a labeled build hash instead.
+
 ## Credentials and data
 
 No RingOS tokens, Wi-Fi passwords, signing keys, device backups or personal diagnostics belong in this repository. On the frame, RingOS authorization lives in a root-only private file outside the web cache and APK. The optional desktop server obtains it from the operating-system keyring. It is never part of the frontend or a release. Public releases require no GitHub token on the frame. GitHub Actions uses its temporary, repository-scoped token only to publish releases.
