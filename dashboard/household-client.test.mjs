@@ -52,3 +52,9 @@ test('manual refresh replaces an in-flight poll and only the newest snapshot upd
  // Even a late callback from the discarded request cannot restore the old list.
  f.requests[0].reply({items:[],usualItems:[]});await tick();assert.equal(f.DATA.groceries[0].id,'fresh');
 });
+
+test('forecast refresh requests fresh provider data and rejects a late obsolete response',async()=>{
+ const f=fixture();const old=f.H.refresh('forecast');f.requests[0].abort=()=>f.requests[0].onabort();const fresh=f.H.refresh('forecast',undefined,true);
+ assert.equal(f.requests[1].url,'/api/household/forecast?refresh=1');const data={temperatureUnit:'F',periods:[],status:'ready',fetchedAt:'2026-10-11T20:00:00Z'};f.requests[1].reply(data);await Promise.all([old,fresh]);assert.equal(f.DATA.forecast.fetchedAt,data.fetchedAt);
+ f.requests[0].reply({...data,fetchedAt:'2026-10-10T20:00:00Z'});await tick();assert.equal(f.DATA.forecast.fetchedAt,data.fetchedAt);assert.equal(f.H.states.forecast.error,null);
+});

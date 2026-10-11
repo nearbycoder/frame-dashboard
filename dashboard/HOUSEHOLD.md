@@ -27,3 +27,11 @@ Photos use a bounded same-origin `/product-image` proxy, because Android 6's cer
 This feature needs the **new native `frame-runtime-armv7`** from **v1.1.2 or newer** (live household endpoints, product photos, item removal, and the faster shopping save path) as well as its dashboard bundle. The web updater alone cannot replace a native runtime. Back up the old root-owned binary, install the verified new binary atomically, and let the kiosk's existing service restart it. Keep the private `ringos.authorization`, verified release cache, bootstrap, and APK in place. The kiosk APK itself does not change.
 
 The prior dashboard remains usable if the new native runtime fails. Restore the backed-up binary and restart its service before applying a web bundle that needs these endpoints.
+
+## Seven-day Tulsa forecast
+
+The **Weather** tab and the clickable Today weather card open a seven-day forecast for Tulsa, Oklahoma 74134 (36.1162, -95.8225, the configured Ring weather point). The frame runtime independently retrieves the full day/night forecast from the [National Weather Service API](https://www.weather.gov/documentation/services-web-api); Ring’s weather tool supplies today’s forecast only. No Ring authorization is sent to NWS. Temperatures are Fahrenheit and dates use America/Chicago, including daylight saving changes. Each low belongs to that day’s evening; expired or missing periods show a dash rather than an invented value. Tap a day for day/night narrative forecasts.
+
+`GET /api/household/forecast` returns a bounded, validated projection. The provider-discovered forecast URL must be an exact HTTPS NWS grid forecast path, and redirects are rejected. The runtime shares and caches successful reads for 15 minutes in memory; Refresh bypasses that cache, with a five-second minimum between provider reads. Failed refreshes label the last confirmed forecast as cached. No forecast survives a native runtime restart until it is fetched again.
+
+This page requires the native runtime from **v1.1.4 or newer**, installed separately from the web update. The kiosk APK does not change.

@@ -1,3 +1,4 @@
+import { createForecast } from './forecast.mjs';
 // Local dashboard + bounded demo-image proxy for legacy Android frames.
 // Upstream TLS is checked by Node; the frame receives assets over Wi-Fi or its USB localhost link.
 import http from 'node:http';
@@ -20,6 +21,7 @@ const pending = new Map();
 const lights = createRingBridge({ authorization: keyringAuthorization() });
 const household = createHouseholdBridge({ rpc: lights.rpc });
 const products = createProductImages();
+const forecast = createForecast();
 let cacheBytes = 0;
 const CACHE_LIMIT = 8 * 1024 * 1024;
 const IMAGE_LIMIT = 4 * 1024 * 1024;
@@ -83,6 +85,7 @@ const server = http.createServer(async (request, response) => {
     const url = new URL(request.url, 'http://localhost');
     if (await products(request, response, url)) return;
     if (await lights.handle(request, response, url)) return;
+    if (await forecast.handle(request, response, url)) return;
     if (await household.handle(request, response, url)) return;
     if (!['GET', 'HEAD'].includes(request.method)) {
       response.writeHead(405, { Allow: 'GET, HEAD' }).end();

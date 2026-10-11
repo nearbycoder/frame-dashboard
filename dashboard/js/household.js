@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   var D = window.DATA;
-  var names = ['calendar', 'chores', 'shopping', 'weather', 'time'];
+  var names = ['calendar', 'chores', 'shopping', 'weather', 'time', 'forecast'];
   var H = App.household = { key: null, states: {}, pending: {}, params: {}, clock: null };
   names.forEach(function (name) { H.states[name] = { data: null, loading: false, error: null, generation: 0, synced: null }; H.pending[name] = {}; });
   var queues = {}, inflight = {}, reads = {}, mono = function () { return performance.now(); };
@@ -16,9 +16,10 @@
   H.instant = function () { return H.clock ? H.clock.epoch + mono() - H.clock.received : Date.now(); };
   App.now = function () { return App.toCentralDate(H.instant()); };
   H.dateKey = function (d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); };
-  function request(method, domain, action, body, week) {
-    var requestedWeek = arguments.length === 5 ? week : H.params[domain];
+  function request(method, domain, action, body, week, force) {
+    var requestedWeek = arguments.length >= 5 ? week : H.params[domain];
     var query = requestedWeek ? '?weekStart=' + encodeURIComponent(requestedWeek) : '';
+    if (domain === 'forecast' && force) query = '?refresh=1';
     return new Promise(function (resolve, reject) {
       var xhr = new XMLHttpRequest();
       if (method === 'GET') (reads[domain] || (reads[domain] = [])).push(xhr);
@@ -65,6 +66,7 @@
       D.groceries = value.items.map(function (g) { return Object.assign({}, g, { done: g.checked, qty: g.quantity, cat: g.category }); });
       D.usuals = value.usualItems;
     }
+    if (domain === 'forecast') { if (!Array.isArray(value.periods) || value.temperatureUnit !== 'F') throw new Error('Forecast returned invalid data.'); D.forecast = value; }
     if (domain === 'weather') { if (!Array.isArray(value.periods) || value.temperatureUnit !== 'F') throw new Error('Weather returned invalid data.'); D.weather = value; }
   }
   function emit(domain) { App.emit('household:' + domain); App.emit('household', domain); }
@@ -78,7 +80,7 @@
     var generation = state.generation, signature = domain + ':' + (H.params[domain] || '') + ':' + generation;
     if (inflight[signature]) return inflight[signature];
     state.loading = true; if (!state.data || state.error) emit(domain); var started = mono();
-    var task = request('GET', domain).then(function (data) {
+    var task = request('GET', domain, '', null, H.params[domain], force).then(function (data) {
       if (generation !== state.generation) return;
       sync(domain, data, started); state.data = data; state.error = null; state.synced = Date.now();
     }).catch(function (e) { if (generation === state.generation) state.error = e.message; }).then(function () { delete inflight[signature]; if (generation === state.generation) { state.loading = false; emit(domain); } });
@@ -124,7 +126,7 @@
   App.on('ready', function () {
     names.forEach(function (name) { H.refresh(name); });
     var seconds = 0;
-    setInterval(function () { if (document.hidden) return; seconds += 60; ['time', 'chores', 'shopping'].forEach(function (name) { H.refresh(name); }); H.refreshTodayChores(); if (seconds % 300 === 0) H.refresh('calendar'); if (seconds % 900 === 0) H.refresh('weather'); }, 60000);
+    setInterval(function () { if (document.hidden) return; seconds += 60; ['time', 'chores', 'shopping'].forEach(function (name) { H.refresh(name); }); H.refreshTodayChores(); if (seconds % 300 === 0) H.refresh('calendar'); if (seconds % 900 === 0) { H.refresh('weather'); H.refresh('forecast'); } }, 60000);
     document.addEventListener('visibilitychange', function () { if (!document.hidden) names.forEach(function (name) { H.refresh(name); }); });
     document.addEventListener('click', function (e) { var b = e.target.closest('[data-refresh]'); if (b) H.refresh(b.dataset.refresh); });
   });
