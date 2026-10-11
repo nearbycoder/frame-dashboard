@@ -13,6 +13,8 @@ import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceError;
 
 /**
  * Full-screen kiosk WebView for the Home HQ wall tablet.
@@ -35,6 +37,12 @@ public class MainActivity extends Activity {
   private final float[] exitX = new float[2];
   private final float[] exitY = new float[2];
   private boolean exitArmed;
+  private boolean loadFailed;
+  private int networkRetries;
+  private String reconnectUrl;
+  private final Runnable reconnectDashboard = new Runnable() {
+    @Override public void run() { if (web != null && reconnectUrl != null) web.loadUrl(reconnectUrl); }
+  };
 
   private final Runnable exitToLauncher = new Runnable() {
     @Override
@@ -66,16 +74,28 @@ public class MainActivity extends Activity {
     s.setAllowContentAccess(false);
     s.setMediaPlaybackRequiresUserGesture(true);
     s.setUserAgentString(s.getUserAgentString() + " HomeHQKiosk");
-    web.setWebViewClient(new WebViewClient()); // keep navigation inside the kiosk
+    web.setWebViewClient(new WebViewClient() {
+      @Override public void onPageStarted(WebView view, String url, android.graphics.Bitmap icon) { loadFailed = false; }
+      @Override public void onPageFinished(WebView view, String url) { if (!loadFailed) networkRetries = 0; }
+      @Override public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+        if (request.isForMainFrame()) retryNetwork(request.getUrl().toString(), error.getErrorCode());
+      }
+      @Override public void onReceivedError(WebView view, int code, String description, String url) { retryNetwork(url, code); }
+    }); // keep navigation inside the kiosk
     setContentView(web);
 
-    web.loadUrl(dashboardUrl(getIntent()));
+    final String launchUrl = dashboardUrl(getIntent());
+    if (getSharedPreferences("network", MODE_PRIVATE).getBoolean("tailscale", false)) {
+      handler.postDelayed(new Runnable() { @Override public void run() { web.loadUrl(launchUrl); } }, 3000);
+    } else web.loadUrl(launchUrl);
   }
 
   @Override
   protected void onNewIntent(Intent intent) {
     super.onNewIntent(intent);
     setIntent(intent);
+    handler.removeCallbacks(reconnectDashboard);
+    networkRetries = 0;
     applyDebugFlag(intent);
     configureTailnet(intent);
     String url = intent.getDataString();
@@ -108,6 +128,18 @@ public class MainActivity extends Activity {
     }
   }
 
+  private void retryNetwork(String url, int code) {
+    loadFailed = true;
+    if (getSharedPreferences("network", MODE_PRIVATE).getBoolean("tailscale", false)
+        && networkRetries < 8 && (code == WebViewClient.ERROR_CONNECT
+            || code == WebViewClient.ERROR_HOST_LOOKUP || code == WebViewClient.ERROR_TIMEOUT)) {
+      reconnectUrl = url;
+      networkRetries++;
+      handler.removeCallbacks(reconnectDashboard);
+      handler.postDelayed(reconnectDashboard, 3000);
+    }
+  }
+
   @Override
   protected void onPause() {
     web.onPause();
@@ -124,7 +156,7 @@ public class MainActivity extends Activity {
 
   @Override
   protected void onDestroy() {
-    handler.removeCallbacks(exitToLauncher);
+    handler.removeCallbacksAndMessages(null);
     web.destroy();
     super.onDestroy();
   }
