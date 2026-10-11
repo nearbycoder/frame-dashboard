@@ -36,8 +36,7 @@ public class TailnetService extends Service {
         + "export HOME=/data/local/tailscale XDG_CACHE_HOME=/data/local/tailscale/cache; "
         + "exec /data/local/tailscale/tailscaled "
         + "--state=/data/local/tailscale/tailscaled.state "
-        + "--socket=/data/local/tailscale/tailscaled.sock --tun=tailscale0 "
-        + ">/data/local/tailscale/daemon.log 2>&1";
+        + "--socket=/data/local/tailscale/tailscaled.sock --tun=tailscale0";
     while (!stopped) {
       try {
         daemon = new ProcessBuilder("/system/xbin/su", "-c", command).redirectErrorStream(true).start();
