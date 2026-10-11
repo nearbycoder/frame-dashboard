@@ -10,6 +10,8 @@ The frame downloads dashboard releases **directly from GitHub** and keeps a veri
 
 See [dashboard/device-runtime/README.md](dashboard/device-runtime/README.md) for the one-time rooted Android 6 setup. It is tested on the ZN-DP1002 with ARMv7 and WebView 107. This runtime is not a firmware image or a rooting method. Subsequent dashboard releases are offered in **Updates** without USB or an APK install.
 
+Tap **Settings**, directly above **Updates**, to choose a Wi-Fi network. The Android network chooser has a **Return to dashboard** button and can be opened while offline. This requires the native runtime from v1.1.5 or newer.
+
 ## Develop on a computer
 
 Tap **Display** in the sidebar to open display settings. **Light** and **Dark** change the interactive dashboard theme; the choice is remembered across page reloads and updates. **Ambient** and **Night** remain available without changing the saved theme.

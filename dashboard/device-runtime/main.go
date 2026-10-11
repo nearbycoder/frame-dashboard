@@ -37,8 +37,9 @@ func secureClient(dns string, redirects bool) *http.Client {
 	}
 	dialer := &net.Dialer{Timeout: 10 * time.Second, KeepAlive: 30 * time.Second}
 	if dns != "" {
+		currentDNS := androidDNS(dns)
 		dialer.Resolver = &net.Resolver{PreferGo: true, Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
-			return (&net.Dialer{Timeout: 5 * time.Second}).DialContext(ctx, network, net.JoinHostPort(dns, "53"))
+			return (&net.Dialer{Timeout: 5 * time.Second}).DialContext(ctx, network, net.JoinHostPort(currentDNS(), "53"))
 		}}
 	}
 	return &http.Client{Timeout: 30 * time.Second, Transport: &http.Transport{DialContext: dialer.DialContext, TLSClientConfig: &tls.Config{RootCAs: pool, MinVersion: tls.VersionTLS12}, TLSHandshakeTimeout: 10 * time.Second, MaxIdleConns: 8, MaxIdleConnsPerHost: 4, IdleConnTimeout: 180 * time.Second}, CheckRedirect: func(req *http.Request, via []*http.Request) error {
@@ -54,6 +55,7 @@ func secureClient(dns string, redirects bool) *http.Client {
 }
 func handler(s *releases, b *bridge, client *http.Client) http.Handler {
 	products := productImages(client)
+	settings := newDeviceSettings(b.key)
 	forecastClient := *client
 	forecastClient.CheckRedirect = func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse }
 	forecast := &forecastService{client: &forecastClient, now: time.Now}
@@ -66,6 +68,10 @@ func handler(s *releases, b *bridge, client *http.Client) http.Handler {
 			return
 		}
 		w.Header().Set("X-Content-Type-Options", "nosniff")
+		if strings.HasPrefix(r.URL.Path, "/api/device-settings") {
+			settings.ServeHTTP(w, r)
+			return
+		}
 		if r.URL.Path == "/product-image" {
 			products.ServeHTTP(w, r)
 			return

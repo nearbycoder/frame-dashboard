@@ -44,3 +44,11 @@ CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 go build -trimpath \
 ```
 
 The release workflow builds the runtime too. Installing a changed native runtime requires a separate deliberate install; web bundles never execute or replace it. Dashboard, runtime and APK versions are independent.
+
+## Wi-Fi recovery from the dashboard
+
+With the **v1.1.5 or newer native runtime**, the sidebar's **Settings** button (above Updates) opens a Wi-Fi dialog. **Choose Wi-Fi network** launches Android's network chooser, where Android handles scanning, password entry, saving networks, and reconnecting. **Return to dashboard** closes that screen; it remains enabled without a connection. The cached dashboard, local Settings API, and Android chooser work offline. No Wi-Fi credentials pass through the dashboard, Ring MCP, or GitHub.
+
+The native runtime refreshes Android's active `net.dns1` at most every five seconds when resolving a host, so changing Wi-Fi does not require restarting the dashboard. A valid startup resolver is retained as fallback while Android has no DNS server. Internet data and release checks resume once the new network provides connectivity.
+
+The only device action is a fixed `android.settings.WIFI_SETTINGS` intent. It requires the loopback Host, exact same-origin POST, an ephemeral device control key available locally without Ring, and an empty bounded JSON object. The API never accepts arbitrary commands or intents. Desktop previews explain that Wi-Fi settings are available on the Android frame. This feature requires installing the native runtime separately; the existing APK does not change.

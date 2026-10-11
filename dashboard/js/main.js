@@ -5,6 +5,7 @@ import './app.js';
 import './lights.js';
 import './household.js';
 import './system.js';
+import './device-settings.js';
 import './updates.js';
 import './views/home.js';
 import './views/calendar.js';
