@@ -2,7 +2,7 @@
 
 ## On the frame
 
-**Updates → Check for updates** checks the published GitHub release via the frame server. The server checks GitHub at most once per minute; the page checks the server every 15 seconds while visible. New releases show a nonblocking **Update / Later** prompt.
+**Updates → Check for updates** asks the frame’s on-device runtime to download the published GitHub release directly. It checks GitHub at most once per minute; the page checks its loopback runtime every 15 seconds while visible. New releases show a nonblocking **Update / Later** prompt.
 
 **Update now** downloads scripts and styles, waits for active touches and light changes, verifies that the selected release is still current, then navigates inside the same WebView. The current section and lite-mode settings are retained. A failed download keeps the current page open.
 
@@ -21,29 +21,27 @@ All release history is at https://github.com/nearbycoder/frame-dashboard/release
 
 ## Download and verification
 
-The server downloads the public bundle over HTTPS from this repository only. It validates file paths, size limits, file SHA-256 values, the HTML content version and every referenced asset before switching the active release. A temporary staging directory prevents partial releases being served. GitHub credentials are not needed for downloads. Hashes detect corruption; publisher authenticity relies on HTTPS and control of this GitHub repository.
+The frame downloads the public bundle over HTTPS from this repository only. It validates file paths, size limits, file SHA-256 values, the HTML content version and every referenced asset before switching the active release. A temporary staging directory prevents partial releases being served. GitHub credentials are not needed for downloads. Hashes detect corruption; publisher authenticity relies on HTTPS and control of this GitHub repository.
 
-The server stores releases in `dashboard/.release-cache/`, excluded from Git. A GitHub outage leaves the last complete release available, including after a server restart. Older assets remain available for displays that defer an update. Initial startup requires either a previously cached release or `npm run build`.
+The standalone frame stores releases in `/data/local/frame-dashboard/<content-version>/`. A GitHub outage leaves the last complete release available, including after a runtime restart. Older assets remain available while the open page defers an update. One-time setup installs a public bootstrap bundle for the first launch. The optional desktop development server uses `dashboard/.release-cache/` instead.
 
 ## Roll back
 
-Restart the frame server with an earlier published tag pinned:
+Publish the desired web source as a new version tag to offer it as the latest release. Keep previous tags/assets intact. For a manual rooted-frame rollback, stop the kiosk/runtime and replace the private `active.json` with an existing verified cached release's metadata, or provision an earlier published bundle as the bootstrap and remove `active.json`. Keep the credential file untouched.
 
-```sh
-FRAME_RELEASE_TAG=v1.0.0 npm run frame --prefix dashboard
-```
+For the optional desktop development server, `FRAME_RELEASE_TAG=v1.0.0 npm run frame --prefix dashboard` pins a prior tag. Remove that variable and restart to follow latest again.
 
-The next **Check for updates → Update now** installs that version. Remove `FRAME_RELEASE_TAG` and restart to follow the latest release again. This changes dashboard assets only; backend changes require checking out the matching source and restarting the server separately.
+## Network and native components
 
-## Network
+The standalone frame connects to GitHub and RingOS directly over Wi-Fi. Its WebView displays files from its own loopback runtime on port 18773. There is no computer server, Cloudflare-hosted dashboard, Tailscale dependency or USB reverse tunnel in this path. RingOS itself is the HTTPS cloud lighting bridge, so live lighting needs internet access.
 
-The frame still needs to reach the server for lights and update downloads; GitHub stores the release source and history. Use the server's reachable Tailscale or private LAN URL. Kiosk 1.1 remembers its configured URL. No Android service worker, app force-stop, USB install or firmware flash is needed for subsequent dashboard releases.
+The ARMv7 runtime is a separate release asset. Web updates never execute or replace native binaries, APKs, WebView or firmware. Native runtime/APK upgrades require a separate install. Root-only credentials are outside the cache and all served paths. Modern public Mozilla CA roots from [curl’s CA extract](https://curl.se/docs/caextract.html) are embedded in the runtime; HTTPS certificate and hostname checks remain enabled.
 
 ## Optional Android 6 Tailscale service
 
 The standard Tailscale Android app requires Android 8+. On this rooted Android 6 frame, the official static Linux ARM client runs instead. Its binaries and login state live under `/data/local/tailscale/` with root-only access; none are included in Git or dashboard bundles. The daemon needs `/dev/net/tun` linked to Android's `/dev/tun` and a Wi-Fi policy route for its underlay mark.
 
-Kiosk 1.2.3 has an opt-in foreground service and boot receiver to keep the installed daemon running independently of USB. The receiver attempts to reopen the dashboard at boot, but automatic startup did not work on the tested stock firmware. After a reboot, open Home HQ once to start the connection. After installing the binaries and authorizing the frame in the computer's tailnet, enable it with:
+The kiosk also has an opt-in foreground service and boot receiver to keep an installed daemon running independently of USB. Tailscale is not required for standalone GitHub updates or lighting. The receiver attempts to reopen the dashboard at boot, but automatic startup did not work on the tested stock firmware. After a reboot, open Home HQ once to start the connection. After installing the binaries and authorizing the frame in the computer's tailnet, enable it with:
 
 ```sh
 adb shell am start -n com.wesbos.homehq/.MainActivity --ez tailscale true

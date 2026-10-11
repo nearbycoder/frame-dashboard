@@ -19,16 +19,27 @@ jobs:
       - run: python3 scripts/check-public-source.py
       - run: npm ci --prefix dashboard
       - run: node --test dashboard/*.test.mjs
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.x'
+          cache: false
+      - run: go test -race ./... && go vet ./...
+        working-directory: dashboard/device-runtime
       - run: npm run build --prefix dashboard
       - if: startsWith(github.ref, 'refs/tags/v')
         run: node dashboard/publish-bundle.mjs "$RELEASE_TAG" dashboard-bundle.json
         env:
           RELEASE_TAG: ${{ github.ref_name }}
       - if: startsWith(github.ref, 'refs/tags/v')
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=7 go build -trimpath -ldflags='-s -w' -o ../../frame-runtime-armv7 .
+        working-directory: dashboard/device-runtime
+      - if: startsWith(github.ref, 'refs/tags/v')
         uses: actions/upload-artifact@v4
         with:
           name: dashboard-bundle
-          path: dashboard-bundle.json
+          path: |
+            dashboard-bundle.json
+            frame-runtime-armv7
   release:
     if: startsWith(github.ref, 'refs/tags/v')
     needs: test
@@ -42,7 +53,7 @@ jobs:
       - name: Publish complete release
         run: |
           gh release create "$RELEASE_TAG" --repo "$RELEASE_REPO" --verify-tag --draft --title "$RELEASE_TAG" --generate-notes
-          gh release upload "$RELEASE_TAG" dashboard-bundle.json --repo "$RELEASE_REPO"
+          gh release upload "$RELEASE_TAG" dashboard-bundle.json frame-runtime-armv7 --repo "$RELEASE_REPO"
           gh release edit "$RELEASE_TAG" --repo "$RELEASE_REPO" --draft=false --latest
         env:
           GH_TOKEN: ${{ github.token }}

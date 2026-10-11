@@ -9,11 +9,11 @@
       var xhr = new XMLHttpRequest(); xhr.open('GET', url); xhr.timeout = 20000;
       if (binary) xhr.responseType = 'arraybuffer';
       xhr.onload = function () {
-        if (xhr.status !== 200) return reject(new Error('The update server is unavailable. Try again when Wi-Fi is connected.'));
+        if (xhr.status !== 200) return reject(new Error('Updates are unavailable. Try again when Wi-Fi is connected.'));
         if (binary) return xhr.response && xhr.response.byteLength ? resolve(xhr.response) : reject(new Error('An update file is incomplete. Try again.'));
-        try { resolve(JSON.parse(xhr.responseText)); } catch (err) { reject(new Error('The update server returned an invalid release.')); }
+        try { resolve(JSON.parse(xhr.responseText)); } catch (err) { reject(new Error('The dashboard update is invalid.')); }
       };
-      xhr.onerror = xhr.ontimeout = function () { reject(new Error('Could not reach the update server. Your current dashboard is still open.')); };
+      xhr.onerror = xhr.ontimeout = function () { reject(new Error('Could not check for updates. Your current dashboard is still open.')); };
       xhr.send();
     });
   }
@@ -25,14 +25,14 @@
     var button = document.querySelector('#dashboardUpdates');
     if (button) button.querySelector('.update-dot').hidden = !U.available;
     if (sheet) {
-      sheet.querySelector('[data-update-status]').textContent = U.applying ? 'Downloading update…' : U.error || (U.available ? 'A new dashboard is ready' + (U.available.tag ? ': ' + U.available.tag : '.') : checking ? 'Checking for updates…' : 'Your dashboard is up to date.');
+      sheet.querySelector('[data-update-status]').textContent = U.applying ? 'Preparing update…' : U.error || (U.available ? 'A new dashboard is ready' + (U.available.tag ? ': ' + U.available.tag : '.') : checking ? 'Checking for updates…' : 'Your dashboard is up to date.');
       sheet.querySelector('[data-update-version]').textContent = U.current ? 'Installed dashboard: ' + (U.currentTag ? U.currentTag + ' · ' : '') + U.current.slice(0, 8) : '';
       sheet.querySelector('[data-update-apply]').hidden = !U.available;
       sheet.querySelector('[data-update-apply]').disabled = U.applying;
       sheet.querySelector('[data-update-check]').disabled = U.applying || !!checking;
     }
     if (U.available && U.available.version !== dismissVersion && !bannerClose && !U.applying) {
-      bannerClose = App.banner({ icon: 'bolt', title: 'Dashboard update available', sub: 'Ready to download over Wi-Fi', action: 'Update', dismiss: 'Later',
+      bannerClose = App.banner({ icon: 'bolt', title: 'Dashboard update available', sub: 'A new release is ready', action: 'Update', dismiss: 'Later',
         onAction: function () { bannerClose = null; U.apply(); } });
       // The existing banner's dismiss control removes it; track dismissal too.
       var banners = document.querySelector('#banners');
@@ -47,7 +47,7 @@
     checking = get('/api/dashboard-update?t=' + Date.now()).then(function (release) {
       if (!valid(release)) throw new Error('The dashboard update is incomplete. Try again shortly.');
       if (!U.current) U.current = release.version;
-      if (release.tag && !/^v\d+\.\d+\.\d+$/.test(release.tag)) throw new Error('The update server returned an invalid release tag.');
+      if (release.tag && !/^v\d+\.\d+\.\d+$/.test(release.tag)) throw new Error('The dashboard release tag is invalid.');
       if (release.version === U.current) U.currentTag = release.tag || null;
       U.available = release.version === U.current ? null : release;
       if (release.updateError) U.error = release.updateError;

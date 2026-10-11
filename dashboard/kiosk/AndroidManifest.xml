@@ -3,6 +3,7 @@
     package="com.wesbos.homehq">
 
   <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
   <application
@@ -12,6 +13,7 @@
       android:usesCleartextTraffic="true"
       android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
     <service android:name=".TailnetService" android:exported="false" />
+    <service android:name=".FrameRuntimeService" android:exported="false" />
     <receiver android:name=".NetworkBootReceiver" android:exported="true">
       <intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /></intent-filter>
     </receiver>

@@ -27,7 +27,7 @@ import android.webkit.WebResourceError;
  */
 public class MainActivity extends Activity {
   static final String TAG = "HomeHQ";
-  static final String DEFAULT_URL = "http://127.0.0.1:4173/?lite=1#home";
+  static final String DEFAULT_URL = "http://127.0.0.1:18773/?lite=1#home";
   static final long EXIT_HOLD_MS = 1500;
   static final float EXIT_SLOP_PX = 60;
 
@@ -62,6 +62,7 @@ public class MainActivity extends Activity {
     super.onCreate(state);
     applyDebugFlag(getIntent());
     configureTailnet(getIntent());
+    startService(new Intent(this, FrameRuntimeService.class));
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
         | WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
@@ -85,7 +86,7 @@ public class MainActivity extends Activity {
     setContentView(web);
 
     final String launchUrl = dashboardUrl(getIntent());
-    if (getSharedPreferences("network", MODE_PRIVATE).getBoolean("tailscale", false)) {
+    if (launchUrl.startsWith("http://127.0.0.1:18773/") || getSharedPreferences("network", MODE_PRIVATE).getBoolean("tailscale", false)) {
       handler.postDelayed(new Runnable() { @Override public void run() { web.loadUrl(launchUrl); } }, 3000);
     } else web.loadUrl(launchUrl);
   }
@@ -98,6 +99,7 @@ public class MainActivity extends Activity {
     networkRetries = 0;
     applyDebugFlag(intent);
     configureTailnet(intent);
+    startService(new Intent(this, FrameRuntimeService.class));
     String url = intent.getDataString();
     if (url != null) web.loadUrl(dashboardUrl(intent));
   }
@@ -130,7 +132,7 @@ public class MainActivity extends Activity {
 
   private void retryNetwork(String url, int code) {
     loadFailed = true;
-    if (getSharedPreferences("network", MODE_PRIVATE).getBoolean("tailscale", false)
+    if ((url.startsWith("http://127.0.0.1:18773/") || getSharedPreferences("network", MODE_PRIVATE).getBoolean("tailscale", false))
         && networkRetries < 8 && (code == WebViewClient.ERROR_CONNECT
             || code == WebViewClient.ERROR_HOST_LOOKUP || code == WebViewClient.ERROR_TIMEOUT)) {
       reconnectUrl = url;

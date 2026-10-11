@@ -1,4 +1,4 @@
-// Per-light request queues. Credentials stay in the server's OS keyring.
+// Per-light request queues. Credentials stay outside the WebView, in the private runtime.
 (function () {
   'use strict';
   var L = App.lights = { items: [], error: null, loaded: false, pending: {}, versions: {}, key: null, syncedAt: null, lastLevels: {} };

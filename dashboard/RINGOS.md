@@ -1,15 +1,17 @@
 # RingOS lighting integration
 
-The local frame server exposes only RingOS's `home_assistant_lights_list` and
+The on-device runtime exposes only RingOS's `home_assistant_lights_list` and
 `home_assistant_light_control` tools. The Home Control screen uses live power,
 brightness and color state. The Today screen's lighting count is live; other
 dashboard sections continue to use the prototype's sample data.
 
-The control path is frame WebView → local Node server → RingOS's HTTPS MCP
-endpoint → Home Assistant bridge → lights. The computer's server, RingOS and the
-Home Assistant bridge must be available. This is not an offline frame app.
+The standalone control path is frame WebView → frame's loopback runtime → RingOS's HTTPS MCP endpoint → Home Assistant bridge → lights. Wi-Fi, RingOS and Home Assistant must be available for live lighting; the computer is not involved. The cached UI opens offline while light requests report a connection failure.
 
-## Run
+## On the frame
+
+Use the [on-device setup](device-runtime/README.md). RingOS authorization lives in `/data/local/frame-dashboard/ringos.authorization`, mode 600 inside a root-only directory. It is outside all served paths and is never included in an APK or release. Each installation needs its own credential.
+
+## Optional desktop development
 
 ```sh
 cd dashboard
@@ -17,16 +19,7 @@ npm run build
 npm run frame
 ```
 
-The server reads its authorization value from the desktop Secret Service
-keyring, with attributes `application=photo-frame-dashboard` and
-`service=ringos`. The token is never included in the client bundle or a token
-file. Unlock the keyring before starting the server. Provision or replace the
-value through a hidden stdin prompt and `secret-tool store`, not shell arguments,
-source files or logs. Each installation needs its own credential.
-
-Open `/?lite=1#control`. On the frame, ADB reverse maps port 4173 to this server.
-With wireless ADB, use `adb -s <frame-ip>:5555 reverse tcp:4173 tcp:4173` after
-disconnecting USB; this old daemon rejects reverse with two active transports.
+The development server reads authorization from the desktop Secret Service keyring, with attributes `application=photo-frame-dashboard` and `service=ringos`. Unlock the keyring before starting it. Provision through a hidden stdin prompt and `secret-tool store`, never shell arguments, source files or logs. A frame using the computer's URL depends on that server. The standalone kiosk uses its own `http://127.0.0.1:18773/?lite=1#control` instead.
 
 ## Behavior
 

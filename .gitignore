@@ -11,3 +11,7 @@ diagnostics/
 backups/
 *.log
 dashboard-bundle.json
+frame-runtime-armv7
+
+__pycache__/
+*.pyc
