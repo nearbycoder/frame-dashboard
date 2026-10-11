@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   var meta = document.querySelector('meta[name="dashboard-build"]');
-  var U = App.updates = { current: meta ? meta.content : null, available: null, applying: false, error: null };
+  var U = App.updates = { current: meta ? meta.content : null, currentTag: null, available: null, applying: false, error: null };
   var checking = null, dismissVersion = null, bannerClose = null, pointers = {}, sheet = null;
   function get(url, binary) {
     return new Promise(function (resolve, reject) {
@@ -25,8 +25,8 @@
     var button = document.querySelector('#dashboardUpdates');
     if (button) button.querySelector('.update-dot').hidden = !U.available;
     if (sheet) {
-      sheet.querySelector('[data-update-status]').textContent = U.applying ? 'Downloading update…' : U.error || (U.available ? 'A new dashboard is ready.' : checking ? 'Checking for updates…' : 'Your dashboard is up to date.');
-      sheet.querySelector('[data-update-version]').textContent = U.current ? 'Installed dashboard: ' + U.current.slice(0, 8) : '';
+      sheet.querySelector('[data-update-status]').textContent = U.applying ? 'Downloading update…' : U.error || (U.available ? 'A new dashboard is ready' + (U.available.tag ? ': ' + U.available.tag : '.') : checking ? 'Checking for updates…' : 'Your dashboard is up to date.');
+      sheet.querySelector('[data-update-version]').textContent = U.current ? 'Installed dashboard: ' + (U.currentTag ? U.currentTag + ' · ' : '') + U.current.slice(0, 8) : '';
       sheet.querySelector('[data-update-apply]').hidden = !U.available;
       sheet.querySelector('[data-update-apply]').disabled = U.applying;
       sheet.querySelector('[data-update-check]').disabled = U.applying || !!checking;
@@ -47,6 +47,8 @@
     checking = get('/api/dashboard-update?t=' + Date.now()).then(function (release) {
       if (!valid(release)) throw new Error('The dashboard update is incomplete. Try again shortly.');
       if (!U.current) U.current = release.version;
+      if (release.tag && !/^v\d+\.\d+\.\d+$/.test(release.tag)) throw new Error('The update server returned an invalid release tag.');
+      if (release.version === U.current) U.currentTag = release.tag || null;
       U.available = release.version === U.current ? null : release;
       if (release.updateError) U.error = release.updateError;
     }).catch(function (error) { U.error = error.message; }).then(function () { checking = null; render(); });

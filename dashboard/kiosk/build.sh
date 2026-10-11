@@ -15,10 +15,10 @@ rm -rf build && mkdir -p build/gen build/classes
 
 "$BT/aapt2" compile --dir res -o build/res.zip
 "$BT/aapt2" link -o build/base.apk -I "$JAR" --manifest AndroidManifest.xml build/res.zip \
-  --java build/gen --min-sdk-version 23 --target-sdk-version 23 --version-code 1 --version-name 1.0
+  --java build/gen --min-sdk-version 23 --target-sdk-version 23 --version-code 3 --version-name 1.2-tailnet
 
 javac -nowarn -source 8 -target 8 -classpath "$JAR" -d build/classes \
-  src/com/wesbos/homehq/*.java build/gen/com/wesbos/homehq/R.java 2>&1 | grep -v "^warning\|^Note\|bootstrap" || true
+  src/com/wesbos/homehq/*.java build/gen/com/wesbos/homehq/R.java
 
 "$BT/d8" --min-api 23 --lib "$JAR" --output build $(find build/classes -name '*.class')
 (cd build && zip -qj base.apk classes.dex)

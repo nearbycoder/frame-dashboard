@@ -53,6 +53,7 @@ public class MainActivity extends Activity {
   protected void onCreate(Bundle state) {
     super.onCreate(state);
     applyDebugFlag(getIntent());
+    configureTailnet(getIntent());
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
         | WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
@@ -76,6 +77,7 @@ public class MainActivity extends Activity {
     super.onNewIntent(intent);
     setIntent(intent);
     applyDebugFlag(intent);
+    configureTailnet(intent);
     String url = intent.getDataString();
     if (url != null) web.loadUrl(dashboardUrl(intent));
   }
@@ -92,6 +94,18 @@ public class MainActivity extends Activity {
       }
     }
     return getPreferences(MODE_PRIVATE).getString("dashboard_url", DEFAULT_URL);
+  }
+
+  private void configureTailnet(Intent intent) {
+    if (intent != null && intent.hasExtra("tailscale")) {
+      getSharedPreferences("network", MODE_PRIVATE).edit()
+          .putBoolean("tailscale", intent.getBooleanExtra("tailscale", false)).apply();
+    }
+    if (getSharedPreferences("network", MODE_PRIVATE).getBoolean("tailscale", false)) {
+      startService(new Intent(this, TailnetService.class));
+    } else if (intent != null && intent.hasExtra("tailscale")) {
+      stopService(new Intent(this, TailnetService.class));
+    }
   }
 
   @Override
