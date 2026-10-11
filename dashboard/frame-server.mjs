@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { createRingBridge, keyringAuthorization } from './ringos.mjs';
 import { readDashboardRelease, stampDashboardRelease } from './dashboard-release.mjs';
 import { githubUpdates } from './github-updates.mjs';
+import { createHouseholdBridge } from './household-server.mjs';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), 'dist');
 const releaseCache = path.join(path.dirname(fileURLToPath(import.meta.url)), '.release-cache');
@@ -16,6 +17,7 @@ const hosts = new Set(['picsum.photos', 'fastly.picsum.photos']);
 const cache = new Map();
 const pending = new Map();
 const lights = createRingBridge({ authorization: keyringAuthorization() });
+const household = createHouseholdBridge({ rpc: lights.rpc });
 let cacheBytes = 0;
 const CACHE_LIMIT = 8 * 1024 * 1024;
 const IMAGE_LIMIT = 4 * 1024 * 1024;
@@ -78,6 +80,7 @@ const server = http.createServer(async (request, response) => {
   try {
     const url = new URL(request.url, 'http://localhost');
     if (await lights.handle(request, response, url)) return;
+    if (await household.handle(request, response, url)) return;
     if (!['GET', 'HEAD'].includes(request.method)) {
       response.writeHead(405, { Allow: 'GET, HEAD' }).end();
       return;

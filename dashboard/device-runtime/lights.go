@@ -146,7 +146,11 @@ func (b *bridge) rpc(ctx context.Context, name string, args any, out any) error 
 	if res.StatusCode != 200 {
 		return errors.New("Lighting request was not confirmed. Check the light before retrying.")
 	}
-	data, e := bounded(res.Body, 512000)
+	limit := int64(512000)
+	if !strings.HasPrefix(name, "home_assistant_") {
+		limit = 2 * 1024 * 1024
+	}
+	data, e := bounded(res.Body, limit)
 	if e != nil {
 		return errors.New("Invalid lighting response.")
 	}

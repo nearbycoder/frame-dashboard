@@ -62,9 +62,9 @@
     return new Promise(function (resolve, reject) {
       var started = Date.now();
       function check() {
-        if (!Object.keys(pointers).length && (!App.lights || !Object.keys(App.lights.pending).length)) return resolve();
-        if (sheet) sheet.querySelector('[data-update-status]').textContent = 'Waiting for your light changes to finish…';
-        if (Date.now() - started > 90000) return reject(new Error('A light change is still pending. Try Update again after it finishes.'));
+        if (!Object.keys(pointers).length && (!App.lights || !Object.keys(App.lights.pending).length) && (!App.household || !App.household.hasPending())) return resolve();
+        if (sheet) sheet.querySelector('[data-update-status]').textContent = 'Waiting for your changes to finish…';
+        if (Date.now() - started > 90000) return reject(new Error('A change is still being saved. Try Update again after it finishes.'));
         setTimeout(check, 200);
       }
       check();
@@ -82,7 +82,7 @@
     }).then(function (latest) {
       if (!valid(latest) || latest.version !== release.version) throw new Error('A newer update arrived. Check again before applying it.');
       // Block new gestures only for the navigation itself, after current writes finish.
-      if (Object.keys(pointers).length || (App.lights && Object.keys(App.lights.pending).length)) return waitForIdle().then(function () { navigate(release); });
+      if (Object.keys(pointers).length || (App.lights && Object.keys(App.lights.pending).length) || (App.household && App.household.hasPending())) return waitForIdle().then(function () { navigate(release); });
       navigate(release);
     }).catch(function (error) { U.applying = false; U.error = error.message; render(); });
   };

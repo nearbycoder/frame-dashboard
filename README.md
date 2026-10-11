@@ -1,12 +1,12 @@
 # Frame Dashboard
 
-A fullscreen home dashboard for Android photo frames, with compact Home Assistant lighting controls and versioned GitHub updates.
+A fullscreen home dashboard for Android photo frames, with live Ring MCP calendars, chores, shopping, weather, Central time, Home Assistant lighting, and versioned GitHub updates.
 
 Based on [wesbos/photo-frame-dashboard](https://github.com/wesbos/photo-frame-dashboard). Original dashboard design, sample data and kiosk sources come from that project. This repository adds lighting state verification, a lightweight display mode, a remembered kiosk URL and GitHub release delivery. No upstream license file was supplied; this repository does not assign a new license to upstream work.
 
 ## On a rooted Android frame
 
-The frame downloads dashboard releases **directly from GitHub** and keeps a verified copy on its own storage. The kiosk displays that local copy. Its small on-device runtime connects directly to RingOS for lighting; the computer does not need to stay on. Wi-Fi is needed for release checks and live lighting. A cached dashboard still opens when offline.
+The frame downloads dashboard releases **directly from GitHub** and keeps a verified copy on its own storage. The kiosk displays that local copy. Its small on-device runtime connects directly to Ring MCP for household data and lighting; the computer does not need to stay on. Wi-Fi is needed for release checks and live data. A cached dashboard still opens when offline.
 
 See [dashboard/device-runtime/README.md](dashboard/device-runtime/README.md) for the one-time rooted Android 6 setup. It is tested on the ZN-DP1002 with ARMv7 and WebView 107. This runtime is not a firmware image or a rooting method. Subsequent dashboard releases are offered in **Updates** without USB or an APK install.
 
@@ -36,7 +36,7 @@ The Updates screen identifies the installed release by its short source Git comm
 
 No RingOS tokens, Wi-Fi passwords, signing keys, device backups or personal diagnostics belong in this repository. On the frame, RingOS authorization lives in a root-only private file outside the web cache and APK. The optional desktop server obtains it from the operating-system keyring. It is never part of the frontend or a release. Public releases require no GitHub token on the frame. GitHub Actions uses its temporary, repository-scoped token only to publish releases.
 
-Calendar, chores, shopping and presence are sample data from the original prototype. Lighting uses live state when configured; see [dashboard/RINGOS.md](dashboard/RINGOS.md).
+Calendar subscriptions, chore participants and occurrences, shopping items and usuals, forecast weather in Fahrenheit, and Central time come from Ring MCP. Calendar subscriptions are read-only. Chore creation/checkoffs and shopping additions/quantities/checkoffs save back to Ring and are followed by a fresh read. Failed writes are not automatically retried. Home Assistant lighting remains live; see [dashboard/RINGOS.md](dashboard/RINGOS.md). Photos show a placeholder until a real photo source is connected; sample photos, people, forecasts and house-status messages have been removed. See [dashboard/HOUSEHOLD.md](dashboard/HOUSEHOLD.md) for required permissions, refresh behavior and upgrading an existing native runtime.
 
 ## Check
 

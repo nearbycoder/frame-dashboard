@@ -19,7 +19,7 @@ function fixture({ offline = false, failure = false } = {}) {
       ? [state]
       : { accepted: true, entityId: light.entityId, at: new Date().toISOString(),
         state: { ...light, state: 'off' } };
-    return new Response(JSON.stringify({ result: { content: [{ type: 'text', text: JSON.stringify(value) }] } }));
+    return new Response(JSON.stringify({ id: JSON.parse(options.body).id, result: { content: [{ type: 'text', text: JSON.stringify(value) }] } }));
   };
   return { bridge: createRingBridge({ authorization: 'Bearer test-only', transport }), calls };
 }
@@ -82,7 +82,7 @@ test('different lights run concurrently while the same light preserves request o
       item.brightness = Math.round(args.brightness * 255 / 100);
       value = { accepted: true, entityId: args.entityId, state: { ...item } };
     }
-    return new Response(JSON.stringify({ result: { content: [{ type: 'text', text: JSON.stringify(value) }] } }));
+    return new Response(JSON.stringify({ id: JSON.parse(options.body).id, result: { content: [{ type: 'text', text: JSON.stringify(value) }] } }));
   } });
   await bridge.list();
   const first = bridge.control({ entityId: 'light.office', brightness: 20 });
@@ -115,7 +115,7 @@ test('an inventory read started before a confirmed write cannot restore stale st
       current = { ...light, brightness: 51 };
       value = { accepted: true, entityId: light.entityId, state: current };
     }
-    return new Response(JSON.stringify({ result: { content: [{ type: 'text', text: JSON.stringify(value) }] } }));
+    return new Response(JSON.stringify({ id: JSON.parse(options.body).id, result: { content: [{ type: 'text', text: JSON.stringify(value) }] } }));
   } });
   await bridge.list();
   const write = bridge.control({ entityId: light.entityId, brightness: 20 });
@@ -134,7 +134,7 @@ test('stale service acknowledgment and delayed HA state are read again before br
     let value;
     if (name === 'home_assistant_light_control') { writes++; value = { accepted: true, entityId: light.entityId, state: light }; }
     else { if (writes) afterReads++; value = [{ ...light, brightness: afterReads >= 3 ? 51 : 128 }]; }
-    return new Response(JSON.stringify({ result: { content: [{ type: 'text', text: JSON.stringify(value) }] } }));
+    return new Response(JSON.stringify({ id: JSON.parse(options.body).id, result: { content: [{ type: 'text', text: JSON.stringify(value) }] } }));
   } });
   const result = await bridge.control({ entityId: light.entityId, brightness: 20 });
   assert.equal(result.light.level, 20); assert.equal(result.settled, true);
@@ -149,9 +149,15 @@ test('toggle waits for real off state; a target that never settles returns obser
       let value;
       if (name === 'home_assistant_light_control') { writes++; value = { accepted: true, entityId: light.entityId, state: light }; }
       else { if (writes) reads++; value = [{ ...light, state: settles && reads >= 2 ? 'off' : 'on' }]; }
-      return new Response(JSON.stringify({ result: { content: [{ type: 'text', text: JSON.stringify(value) }] } }));
+      return new Response(JSON.stringify({ id: JSON.parse(options.body).id, result: { content: [{ type: 'text', text: JSON.stringify(value) }] } }));
     } });
     const result = await bridge.control({ entityId: light.entityId, power: 'off' });
     assert.equal(result.light.on, !settles); assert.equal(result.settled, settles); assert.equal(writes, 1);
   }
+});
+
+
+test('MCP responses with a different request ID cannot become confirmed state', async () => {
+ const bridge=createRingBridge({authorization:'test-only',transport:async()=>new Response(JSON.stringify({id:'wrong-request',result:{content:[{type:'text',text:'{}'}]}}))});
+ await assert.rejects(bridge.rpc('date_time_get',{}), /could not confirm/);
 });

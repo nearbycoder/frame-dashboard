@@ -57,22 +57,23 @@ export function createRingBridge({ authorization, transport = fetch,
   };
   async function rpc(name, args, timeout = 30000) {
     if (!authorization) throw new Error('RingOS credential is unavailable. Unlock the computer’s keyring and restart the dashboard server.');
+    const requestId = randomBytes(8).toString('hex');
     const response = await transport(endpoint, {
       method: 'POST', signal: AbortSignal.timeout(timeout), redirect: 'error',
       headers: { Authorization: authorization, 'Content-Type': 'application/json',
         Accept: 'application/json, text/event-stream', Origin: new URL(endpoint).origin,
         'User-Agent': 'FrameDashboard/1.0', 'MCP-Protocol-Version': '2025-03-26' },
-      body: JSON.stringify({ jsonrpc: '2.0', id: randomBytes(8).toString('hex'),
+      body: JSON.stringify({ jsonrpc: '2.0', id: requestId,
         method: 'tools/call', params: { name, arguments: args } }),
     });
     if (!response.ok) throw new Error(response.status === 401 || response.status === 403
       ? 'RingOS rejected the credential or its lighting permissions.' : 'RingOS could not complete the request. Check the light before retrying.');
     const text = await response.text();
-    if (text.length > 512000) throw new Error('RingOS response is too large.');
+    if (text.length > (name.startsWith('home_assistant_') ? 512000 : 2 * 1024 * 1024)) throw new Error('RingOS response is too large.');
     const data = text.trim().startsWith('{') ? JSON.parse(text)
       : text.split('\n').filter(line => line.startsWith('data:')).map(line => JSON.parse(line.slice(5)))
-        .find(item => item.id);
-    if (!data || data.error || !data.result || data.result.isError) {
+        .find(item => item.id === requestId);
+    if (!data || data.id !== requestId || data.error || !data.result || data.result.isError) {
       throw new Error('RingOS could not confirm the request. Check the light before retrying.');
     }
     const content = data.result.content.find(item => item.type === 'text');
@@ -200,7 +201,7 @@ export function createRingBridge({ authorization, transport = fetch,
     }
     return true;
   }
-  return { list, control, handle };
+  return { list, control, handle, rpc };
 }
 
 export function keyringAuthorization() {

@@ -1,142 +1,39 @@
-// Tasks / chores: one lane per person + "Anyone", scoped to the current time-of-day routine.
+// Chore occurrences are identified by both chore ID and their Central calendar date.
 (function () {
-  'use strict';
-  var D = window.DATA;
-  var V = { el: null, routine: null, pending: {} };
-  var LANES = ['alex', 'jordan', 'maya', 'otto', 'any'];
-
-  function routine() { return V.routine ? D.routines.filter(function (r) { return r.id === V.routine; })[0] : App.currentRoutine(); }
-  function listFor(who, r) {
-    return D.chores.filter(function (c) { return c.r === r.id && c.who === who; })
-      .sort(function (a, b) { return (a.done - b.done) || ((b.overdue ? 1 : 0) - (a.overdue ? 1 : 0)); });
-  }
-
-  function row(c, p) {
-    var pend = V.pending[c.id];
-    return '<button class="ch' + (c.done ? ' is-done' : '') + (pend ? ' is-checking' : '') + (c.overdue && !c.done ? ' is-overdue' : '') + '" data-ch="' + c.id + '">' +
-      '<span class="ch-emoji">' + c.emoji + '<span class="ch-check"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M5 12.5l4.5 4.5L19 7"/></svg></span></span>' +
-      '<span class="ch-text"><b>' + App.esc(c.title) + '</b>' +
-      (c.overdue && !c.done ? '<small class="ch-late">Overdue</small>' : c.stars ? '<small>' + App.icon('star', 14, 'i--fill') + c.stars + (c.doneBy ? ' · ' + App.person(c.doneBy).name : '') + '</small>' : (c.doneBy ? '<small>by ' + App.person(c.doneBy).name + '</small>' : '')) +
-      '</span>' +
-      '</button>';
-  }
-
-  function weekGrid(id) {
-    var w = D.week[id];
-    if (!w) return '';
-    var today = (App.now().getDay() + 6) % 7;
-    return '<div class="ch-week"><div class="label">This week</div><div class="ch-week-row">' + ['M', 'T', 'W', 'T', 'F', 'S', 'S'].map(function (d, i) {
-      var cls = i > today ? 'is-future' : i === today ? 'is-today' : (w[i] ? 'is-hit' : 'is-miss');
-      return '<span class="' + cls + '"><i></i>' + d + '</span>';
-    }).join('') + '</div></div>';
-  }
-
-  function lane(who, r) {
-    var p = App.person(who), list = listFor(who, r);
-    var done = list.filter(function (c) { return c.done; }).length;
-    var all = list.length && done === list.length;
-    var kid = D.stars[who] != null;
-    return '<section class="ch-lane' + (all ? ' is-complete' : '') + '" data-lane="' + who + '" style="' + App.pstyle(p) + '">' +
-      '<header class="ch-head">' + App.avatar(p, 42) +
-      '<div><b>' + (who === 'any' ? 'Anyone' : p.name) + '</b>' +
-      (kid ? '<span class="ch-stars">' + App.icon('star', 18, 'i--fill') + '<span class="num">' + D.stars[who] + '</span></span>' : '<span class="ch-sub">' + (who === 'any' ? 'Up for grabs' : (list.length ? done + ' of ' + list.length : 'Nothing')) + '</span>') + '</div>' +
-      '<div class="ch-ring">' + App.ring(done, list.length || 1, 46) + '<span class="num">' + (all ? '✓' : list.length ? done + '/' + list.length : '–') + '</span></div>' +
-      '</header>' +
-      '<div class="ch-list">' + (list.length ? list.map(function (c) { return row(c, p); }).join('') : '<div class="ch-none serif"><i>Nothing this ' + (r.id === 'evening' ? 'evening' : r.id === 'morning' ? 'morning' : 'afternoon') + '</i></div>') +
-      (all ? '<div class="ch-alldone serif">All done<i>!</i></div>' : '') + '</div>' +
-      weekGrid(who) +
-      '</section>';
-  }
-
-  function render() {
-    var r = routine(), auto = App.currentRoutine();
-    var inR = D.chores.filter(function (c) { return c.r === r.id; });
-    var done = inR.filter(function (c) { return c.done; }).length;
-    V.el.innerHTML = '<div class="tasks">' +
-      '<header class="t-head">' +
-      '<div class="t-title"><div class="label">' + (r.id === auto.id ? 'Right now · ' : '') + r.range + '</div><h1 class="serif">' + r.name + '</h1></div>' +
-      '<div class="seg">' + D.routines.map(function (x) { return '<button class="' + (x.id === r.id ? 'is-on' : '') + '" data-r="' + x.id + '">' + x.name + '</button>'; }).join('') + '</div>' +
-      '<div class="t-progress"><span class="num">' + done + '<small>/' + inR.length + '</small></span><div class="t-bar"><i style="width:' + (inR.length ? done / inR.length * 100 : 0) + '%"></i></div><span class="label">done</span></div>' +
-      '</header>' +
-      '<div class="ch-lanes">' + LANES.map(function (w) { return lane(w, r); }).join('') + '</div>' +
-      '</div>';
-  }
-
-  function complete(c, btn, by) {
-    var r = routine();
-    V.pending[c.id] = true;
-    btn.classList.add('is-checking');
-    setTimeout(function () {
-      delete V.pending[c.id];
-      c.done = true;
-      if (by) c.doneBy = by;
-      var earner = D.stars[c.who] != null ? c.who : (by && D.stars[by] != null ? by : null);
-      if (earner && c.stars) D.stars[earner] += c.stars;
-      render();
-      App.emit('data');
-      var laneList = listFor(c.who, r);
-      var laneDone = laneList.every(function (x) { return x.done; });
-      var allDone = D.chores.filter(function (x) { return x.r === r.id; }).every(function (x) { return x.done; });
-      if (allDone) {
-        App.toast('<b>' + r.name + ' routine complete!</b> Everyone crushed it.', { icon: 'star', ms: 5000 });
-        return;
-      }
-      App.toast('<b>' + App.esc(c.title) + '</b> done' + (earner && c.stars ? ' · +' + c.stars + '★ ' + App.person(earner).name : ''), {
-        icon: 'check',
-        undo: function () {
-          c.done = false;
-          delete c.doneBy;
-          if (earner && c.stars) D.stars[earner] -= c.stars;
-          render();
-          App.emit('data');
-        }
-      });
-    }, 350);
-  }
-
-  // "Anyone" chores ask who did it, so stars go to the right kid
-  function whoDidIt(c, btn) {
-    App.sheet('<div class="sheet-pad"><div class="label">' + c.emoji + ' ' + App.esc(c.title) + '</div><h2 class="serif sheet-h">Who did it?</h2>' +
-      '<div class="add-who add-who--big">' + D.people.map(function (p) {
-        return '<button class="who-btn" data-by="' + p.id + '" style="' + App.pstyle(p) + '">' + App.avatar(p, 88) + '<span>' + p.name + '</span></button>';
-      }).join('') + '</div></div>', {
-      onMount: function (s, close) {
-        s.addEventListener('click', function (e) {
-          var b = e.target.closest('[data-by]');
-          if (!b) return;
-          close();
-          var fresh = V.el.querySelector('[data-ch="' + c.id + '"]');
-          complete(c, fresh || btn, b.dataset.by);
-        });
-      }
-    });
-  }
-
-  function onClick(e) {
-    var t;
-    if ((t = e.target.closest('[data-r]'))) { V.routine = t.dataset.r === App.currentRoutine().id ? null : t.dataset.r; return render(); }
-    if ((t = e.target.closest('[data-ch]'))) {
-      var c = D.chores.filter(function (x) { return x.id === t.dataset.ch; })[0];
-      if (!c || V.pending[c.id]) return;
-      if (c.done) {
-        c.done = false;
-        var earner = D.stars[c.who] != null ? c.who : (c.doneBy && D.stars[c.doneBy] != null ? c.doneBy : null);
-        if (earner && c.stars) D.stars[earner] -= c.stars;
-        delete c.doneBy;
-        render();
-        App.emit('data');
-        return;
-      }
-      if (c.who === 'any') return whoDidIt(c, t);
-      complete(c, t);
-    }
-  }
-
-  App.register('tasks', {
-    show: function (el) {
-      if (!V.el) { V.el = el; el.addEventListener('click', onClick); }
-      render();
-    }
+ 'use strict';
+ var H = App.household, D = window.DATA, V = { el: null, day: null };
+ function selected() { return V.day || H.dateKey(App.now()); }
+ function row(c) { var pending = H.pending.chores[c.id]; return '<button class="live-chore' + (c.completed ? ' is-done' : '') + '" data-chore="' + App.esc(c.id) + '" ' + (pending ? 'disabled' : '') + '><span class="live-check">' + (pending ? '…' : c.completed ? '✓' : '') + '</span><span><b>' + App.esc(c.title) + '</b><small>' + (pending ? 'Saving…' : c.overdue ? 'Overdue · ' + c.date : c.notes ? App.esc(c.notes) : c.repeat === 'once' ? 'One time' : c.repeat) + '</small></span></button>'; }
+ function render() {
+  if (!V.el) return; var s = H.states.chores, data = s.data, day = selected();
+  var list = D.chores.filter(function (c) { return c.date === day || c.overdue; });
+  var completed = list.filter(function (c) { return c.completed; }).length;
+  var start = data ? App.toCentralDate(data.weekStart) : App.dayStart(App.now());
+  V.el.innerHTML = '<div class="live-page"><header class="live-head"><div><div class="label">Shared chores · Central time</div><h1 class="serif">Chores</h1></div><button class="icon-btn" data-week="-1" aria-label="Previous week">' + App.icon('left', 24) + '</button><button class="btn" data-today>Today</button><button class="icon-btn" data-week="1" aria-label="Next week">' + App.icon('right', 24) + '</button><span class="live-count">' + (data ? completed + ' / ' + list.length + ' done' : '') + '</span><button class="btn btn--solid" data-create ' + (!data || !D.people.length ? 'disabled' : '') + '>Add chore</button></header>' + H.statusHTML('chores') +
+   '<div class="live-week">' + [0, 1, 2, 3, 4, 5, 6].map(function (i) { var d = App.addDays(start, i), key = H.dateKey(d); return '<button data-date="' + key + '" class="' + (key === day ? 'is-on' : '') + '"><b>' + App.fmt.dayShort(d) + '</b><span>' + d.getDate() + '</span></button>'; }).join('') + '</div>' +
+   '<div class="live-chore-lanes">' + D.people.map(function (p) { var chores = list.filter(function (c) { return c.personId === p.id; }); return '<section class="live-person-lane"><header style="' + App.pstyle(p) + '"><b>' + App.esc(p.name) + '</b><span>' + chores.filter(function (c) { return c.completed; }).length + ' / ' + chores.length + '</span></header><div class="live-person-list">' + (chores.length ? chores.map(row).join('') : '<p class="live-note">Nothing assigned for this date.</p>') + '</div></section>'; }).join('') + (!D.people.length ? '<p class="live-empty serif">' + (data ? 'Add participants in Ring OS to assign chores.' : 'Chores not connected yet.') + '</p>' : '') + '</div></div>';
+ }
+ function addSheet() {
+  App.sheet('<form class="sheet-pad live-form"><div class="label">Shared chores</div><h2 class="serif sheet-h">Add chore</h2><label>Chore<input name="title" maxlength="160" required placeholder="What needs doing?"></label><label>Assigned to<select name="person">' + D.people.map(function (p) { return '<option value="' + App.esc(p.id) + '">' + App.esc(p.name) + '</option>'; }).join('') + '</select></label><div class="live-form-row"><label>Start date<input name="date" type="date" value="' + selected() + '" required></label><label>Repeat<select name="repeat"><option value="once">One time</option><option value="daily">Daily</option><option value="weekly">Weekly</option></select></label></div><label class="live-weekday-field" hidden>Weekly days<div class="live-weekday-options">' + ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(function (day, i) { return '<label><input type="checkbox" name="weekday" value="' + (i + 1) + '">' + day + '</label>'; }).join('') + '</div></label><label>Notes<input name="notes" maxlength="1000" placeholder="Optional"></label><p class="live-warning" data-error role="status"></p><div class="sheet-actions"><button type="button" class="btn" data-close>Cancel</button><button class="btn btn--solid" type="submit">Save chore</button></div></form>', {
+   cls: 'sheet--wide', onMount: function (sheet, close) {
+    var form = sheet.querySelector('form'), repeat = form.elements.repeat;
+    repeat.onchange = function () { sheet.querySelector('.live-weekday-field').hidden = repeat.value !== 'weekly'; };
+    form.onsubmit = function (e) {
+     e.preventDefault(); var schedule = { repeat: repeat.value, startDate: form.elements.date.value };
+     if (schedule.repeat === 'weekly') { schedule.weekdays = Array.prototype.filter.call(form.querySelectorAll('[name=weekday]'), function (x) { return x.checked; }).map(function (x) { return +x.value; }); if (!schedule.weekdays.length) { sheet.querySelector('[data-error]').textContent = 'Choose at least one weekly day.'; return; } }
+     var button = form.querySelector('[type=submit]'); button.disabled = true;
+     H.write('chores', 'create', { personId: form.elements.person.value, title: form.elements.title.value.trim(), notes: form.elements.notes.value.trim(), schedule: schedule }, 'create').then(function () { close(); App.toast('Chore saved', { icon: 'check' }); }, function (error) { button.disabled = false; sheet.querySelector('[data-error]').textContent = error.message; });
+    };
+   }
   });
-  App.on('time', function () { V.routine = null; });
+ }
+ function click(e) { var b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.chore) { var c = D.chores.filter(function (c) { return c.id === b.dataset.chore; })[0]; if (c) H.write('chores', 'complete', { choreId: c.choreId, date: c.date, completed: !c.completed }, c.id).catch(function (e) { App.toast(App.esc(e.message), { tone: 'error' }); }); return; }
+  if (b.dataset.date) { V.day = b.dataset.date; return render(); }
+  if (b.dataset.week) { var week = H.states.chores.data ? App.toCentralDate(H.states.chores.data.weekStart) : App.now(); V.day = H.dateKey(App.addDays(week, +b.dataset.week * 7)); H.refresh('chores', V.day); return render(); }
+  if (b.hasAttribute('data-today')) { V.day = null; H.refresh('chores', null); return render(); }
+  if (b.hasAttribute('data-create')) addSheet();
+ }
+ App.register('tasks', { show: function (el) { if (!V.el) { V.el = el; el.addEventListener('click', click); } render(); } });
+ App.on('household:chores', function () { if (App.current === 'tasks') render(); else App.views.tasks._dirty = true; });
 })();

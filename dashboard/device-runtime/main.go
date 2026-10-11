@@ -62,6 +62,10 @@ func handler(s *releases, b *bridge, client *http.Client) http.Handler {
 			return
 		}
 		w.Header().Set("X-Content-Type-Options", "nosniff")
+		if strings.HasPrefix(r.URL.Path, "/api/household/") {
+			b.handleHousehold(w, r)
+			return
+		}
 		if strings.HasPrefix(r.URL.Path, "/api/lights") {
 			b.handle(w, r)
 			return

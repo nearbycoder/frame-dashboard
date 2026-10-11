@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   var D = window.DATA;
-  var App = window.App = { state: D, views: {}, current: null, mode: 'day', calMode: 'normal' };
+  var App = window.App = { state: D, views: {}, current: null, mode: 'day' };
   App.lite = !!window.HQ_LITE;
   App.theme = window.HQ_THEME === 'dark' ? 'dark' : 'light';
   var $ = App.$ = function (s, r) { return (r || document).querySelector(s); };
@@ -83,13 +83,7 @@
   };
 
   // ------------------------------------------------------------ calendar helpers
-  App.events = function () {
-    var list = D.events.slice();
-    var today = App.dayStart(App.now());
-    if (App.calMode === 'busy') list = list.concat(D.busyExtras);
-    if (App.calMode === 'empty') list = list.filter(function (e) { return e.allDay || !App.sameDay(e.start, today); });
-    return list;
-  };
+  App.events = function () { return D.events.slice().sort(function (a, b) { return a.start - b.start; }); };
   App.isFamily = function (e) { return e.people.length >= D.people.length; };
   App.evColor = function (e) { return App.isFamily(e) ? D.family : App.person(e.people[0]); };
   App.timedOn = function (day, pid) {
@@ -114,41 +108,6 @@
   };
   App.findEvent = function (id) {
     return App.events().filter(function (e) { return e.id === id; })[0];
-  };
-
-  // ------------------------------------------------------------ chores + weather helpers
-  App.currentRoutine = function () {
-    var h = App.now().getHours();
-    for (var i = 0; i < D.routines.length; i++) if (h >= D.routines[i].from && h < D.routines[i].to) return D.routines[i];
-    return D.routines[2];
-  };
-  App.weatherNow = function () {
-    var W = D.weather, h = App.now().getHours();
-    var rainAt = -1;
-    for (var i = h; i < 24; i++) if (W.p[i] >= 50) { rainAt = i; break; }
-    var summary, advice;
-    if (rainAt === h) {
-      var stop = h; while (stop < 24 && W.p[stop] >= 50) stop++;
-      summary = 'Rain until ' + App.fmt.hour(new Date(2000, 0, 1, stop));
-      advice = 'Umbrella weather';
-    } else if (rainAt > -1) {
-      summary = 'Rain from ' + App.fmt.hour(new Date(2000, 0, 1, rainAt));
-      var soccer = App.timedOn(App.now()).filter(function (e) { return /soccer/i.test(e.title) && e.start > App.now(); })[0];
-      advice = soccer ? 'Pack a rain jacket for soccer' : 'Grab a rain jacket';
-    } else {
-      summary = W.t[h] < 12 ? 'Clear and cool' : 'Dry all day';
-      advice = W.t[h] < 12 ? 'Jacket weather' : 'Light layers';
-    }
-    var labels = { sun: 'Sunny', moon: 'Clear', partly: 'Partly cloudy', cloud: 'Overcast', rain: 'Rain' };
-    return { temp: W.t[h], cond: W.c[h], label: labels[W.c[h]], hi: W.hi, lo: W.lo, summary: summary, advice: advice, hour: h };
-  };
-  App.hourly = function (count) {
-    var W = D.weather, h = App.now().getHours(), out = [];
-    for (var i = 0; i < count; i++) {
-      var x = (h + i) % 24;
-      out.push({ h: x, t: W.t[x], c: W.c[x], p: W.p[x], label: i === 0 ? 'Now' : ((x % 12 || 12) + (x >= 12 ? 'p' : 'a')) });
-    }
-    return out;
   };
 
   // ------------------------------------------------------------ router
@@ -298,7 +257,7 @@
   var idleSec = 0;
   function onIdleTick() {
     idleSec++;
-    var blocked = $('#takeover').classList.contains('is-open');
+    var blocked = $('#sheetLayer').classList.contains('is-open') || (App.household && App.household.hasPending()) || (document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName));
     if (App.mode === 'nightdash' && idleSec >= 20) { App.setMode('night'); return; }
     if (App.mode !== 'day' || blocked) return;
     if (idleSec === App.idle.home && App.current !== 'home') { App.closeSheet(); App.go('home'); }
@@ -356,6 +315,8 @@
       if (b && e.detail === 0) App.go(b.dataset.go);
     });
     document.addEventListener('pointerdown', App.resetIdle, true);
+    document.addEventListener('keydown', App.resetIdle, true);
+    document.addEventListener('input', App.resetIdle, true);
     window.addEventListener('hashchange', function () { App.go(location.hash.slice(1)); });
     App.go(location.hash.slice(1) || 'home');
     tick();

@@ -48,3 +48,9 @@ test('downloads finish before navigation and outstanding light commands delay ap
 test('a release replaced while downloading requires another check instead of navigating to unprepared assets',async()=>{
  const f=fixture();f.ready();f.requests[0].reply(release(newer));await tick();f.U.apply();f.requests[1].reply(new ArrayBuffer(10));f.requests[2].reply(new ArrayBuffer(10));await tick();f.requests[3].reply(release('cccccccccccccccc'));await tick();assert.equal(f.destinations.length,0);assert.equal(f.U.applying,false);
 });
+
+
+test('household writes delay update navigation while the rest of the interface stays open',async()=>{
+ const f=fixture();let pending=true;f.App.household={hasPending:()=>pending};f.ready();f.requests[0].reply(release(newer));await tick();f.U.apply();f.requests[1].reply(new ArrayBuffer(10));f.requests[2].reply(new ArrayBuffer(10));await tick();assert.equal(f.destinations.length,0);
+ pending=false;f.timers.shift()();await tick();f.requests[3].reply(release(newer));await tick();assert.equal(f.destinations.length,1);
+});
