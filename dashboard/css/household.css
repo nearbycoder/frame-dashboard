@@ -105,3 +105,5 @@
 .usual-footer { display: flex; align-items: center; gap: 12px; flex-shrink: 0; padding-top: 10px; }
 .usual-pages { margin-right: auto; color: var(--mute); font-size: 18px; }
 .usual-grid > .live-empty { grid-column: 1 / -1; }
+.s-remove { width: 60px; height: 60px; flex-shrink: 0; margin-left: 8px; border-radius: 12px; display: grid; place-items: center; color: var(--mute); }
+.s-remove:active { color: var(--ink); background: var(--line); }

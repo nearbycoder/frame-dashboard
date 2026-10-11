@@ -41,7 +41,7 @@ func secureClient(dns string, redirects bool) *http.Client {
 			return (&net.Dialer{Timeout: 5 * time.Second}).DialContext(ctx, network, net.JoinHostPort(dns, "53"))
 		}}
 	}
-	return &http.Client{Timeout: 30 * time.Second, Transport: &http.Transport{DialContext: dialer.DialContext, TLSClientConfig: &tls.Config{RootCAs: pool, MinVersion: tls.VersionTLS12}, TLSHandshakeTimeout: 10 * time.Second, MaxIdleConns: 8, MaxIdleConnsPerHost: 4, IdleConnTimeout: 30 * time.Second}, CheckRedirect: func(req *http.Request, via []*http.Request) error {
+	return &http.Client{Timeout: 30 * time.Second, Transport: &http.Transport{DialContext: dialer.DialContext, TLSClientConfig: &tls.Config{RootCAs: pool, MinVersion: tls.VersionTLS12}, TLSHandshakeTimeout: 10 * time.Second, MaxIdleConns: 8, MaxIdleConnsPerHost: 4, IdleConnTimeout: 180 * time.Second}, CheckRedirect: func(req *http.Request, via []*http.Request) error {
 		if !redirects || len(via) > 5 || req.URL.Scheme != "https" || req.URL.Port() != "" || req.URL.User != nil {
 			return http.ErrUseLastResponse
 		}

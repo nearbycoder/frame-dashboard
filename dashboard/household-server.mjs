@@ -2,7 +2,7 @@
 import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { networkInterfaces } from 'node:os';
 const tools={calendar:'calendar_events_list',chores:'chores_list',shopping:'shopping_list_get',weather:'weather_forecast_get',time:'date_time_get'};
-const writes={'chores/complete':'chores_complete','chores/create':'chores_create','shopping/add':'shopping_list_add','shopping/update':'shopping_list_update'};
+const writes={'chores/complete':'chores_complete','chores/create':'chores_create','shopping/add':'shopping_list_add','shopping/update':'shopping_list_update','shopping/remove':'shopping_list_remove'};
 const uuid=v=>typeof v==='string'&&/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(v);
 const date=v=>typeof v==='string'&&/^20\d{2}-\d{2}-\d{2}$/.test(v)&&!isNaN(Date.parse(v+'T12:00:00Z'))&&new Date(v+'T12:00:00Z').toISOString().slice(0,10)===v;
 export function validateHousehold(action,a){
@@ -18,9 +18,24 @@ export function validateHousehold(action,a){
  }
  if(action==='add')valid=only(a,['name','usualItemId','quantity','note'])&&('name'in a)!==('usualItemId'in a)&&text('name',240,'name'in a)&&text('usualItemId',100,'usualItemId'in a)&&quantity()&&text('note',500);
  if(action==='update')valid=only(a,['id','quantity','checked','note'])&&text('id',100,true)&&['quantity','checked','note'].some(k=>k in a)&&quantity()&&(!('checked'in a)||typeof a.checked==='boolean')&&text('note',500);
+ if(action==='remove')valid=only(a,['id'])&&text('id',100,true);
  if(!valid)throw Error('Choose valid household settings.');return a;
 }
 function valid(domain,data){if(!data||Array.isArray(data)||typeof data!=='object')return false;const arr=k=>Array.isArray(data[k]);return {calendar:()=>arr('sources')&&arr('events'),chores:()=>arr('people')&&arr('occurrences')&&arr('overdue'),shopping:()=>arr('items')&&arr('usualItems'),weather:()=>arr('periods')&&['ready','stale','unavailable'].includes(data.status)&&data.temperatureUnit==='F',time:()=>Number.isFinite(data.unixMs)&&data.unixMs>0&&data.timeZone==='America/Chicago'}[domain]();}
+// Ring commits shopping and returns the resulting snapshot in one transaction.
+// Accept it only when the requested edit is present; older acknowledgments use a read.
+export function confirmedShopping(action, input, data) {
+ if (!valid('shopping', data) || typeof data.updatedAt !== 'string' || !Number.isFinite(Date.parse(data.updatedAt)) || !data.items.every(i=>i&&typeof i.id==='string')) return false;
+ if (action === 'remove') return !data.items.some(i => i?.id === input.id);
+ if (action === 'update') {
+  const item = data.items.find(i => i?.id === input.id);
+  return !!item && item.updatedAt === data.updatedAt && ['quantity','checked','note'].every(k => !(k in input) || item[k] === input[k]);
+ }
+ if (action === 'add') return data.items.some(i => i && i.checked === false && typeof i.quantity === 'number' && i.updatedAt === data.updatedAt
+  && (input.usualItemId ? i.usualItemId === input.usualItemId : i.name === input.name.trim())
+  && i.quantity >= (input.quantity || 1) && i.note === input.note);
+ return false;
+}
 export function createHouseholdBridge({rpc}){
  const key=randomBytes(32).toString('hex'),hosts=new Set(['localhost','127.0.0.1','[::1]']),queues=new Map();
  for(const list of Object.values(networkInterfaces()))for(const address of list||[])if(address.family==='IPv4')hosts.add(address.address);
@@ -39,7 +54,11 @@ export function createHouseholdBridge({rpc}){
    if(request.headers['content-type']?.split(';')[0]!=='application/json'){send(415,{error:'Expected JSON.'});return true;}
    let raw='';for await(const chunk of request){raw+=chunk.toString();if(Buffer.byteLength(raw)>8192){send(413,{error:'Request too large.'});return true;}}
    let body;try{body=validateHousehold(action,JSON.parse(raw));}catch{send(400,{error:'Choose valid household settings.'});return true;}
-   const data=await serialize(domain,async()=>{await rpc(writes[domain+'/'+action],body);return rpc(tools[domain],args);});if(!valid(domain,data))throw Error();delete data.orders;send(200,{data,controlKey:key});
+   let waitMs=0,writeMs=0,readMs=0;const queued=performance.now();
+   let data=await serialize(domain,async()=>{waitMs=performance.now()-queued;const start=performance.now();const ack=await rpc(writes[domain+'/'+action],body);writeMs=performance.now()-start;if(domain==='shopping'&&confirmedShopping(action,body,ack))return ack;const readStart=performance.now();const value=await rpc(tools[domain],args);readMs=performance.now()-readStart;return value;});
+   if(!valid(domain,data))throw Error();delete data.orders;
+   response.setHeader('Server-Timing',`queue;dur=${waitMs.toFixed(1)}, write;dur=${writeMs.toFixed(1)}, read;dur=${readMs.toFixed(1)}`);
+   const partial=domain==='shopping'&&request.headers['x-household-compact']==='1';if(partial)data={items:data.items,updatedAt:data.updatedAt};send(200,{data,controlKey:key,...(partial?{partial:true}:{})});
   }catch{send(503,{error:request.method==='POST'?'The change was not confirmed. Refresh to check before trying again.':'Live '+domain+' data is unavailable. Check Wi-Fi and Ring MCP permissions.'});}
   return true;
  }};

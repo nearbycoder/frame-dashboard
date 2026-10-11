@@ -2,7 +2,7 @@
 (function () {
  'use strict';
  var H = App.household, D = window.DATA;
- var V = { el: null, query: '', checked: false, picker: null, search: '', category: '', page: 0, catalog: [] };
+ var V = { el: null, query: '', checked: false, picker: null, search: '', category: '', page: 0, catalog: [], listSignature: null };
  var pageSize = 18;
  function error(e) { App.toast(App.esc(e.message), { tone: 'error', ms: 6000 }); }
  function usual(id) { return D.usuals.filter(function (u) { return u.id === id; })[0]; }
@@ -14,7 +14,7 @@
  function imageError(e) { if (e.target.tagName === 'IMG') e.target.remove(); }
  function row(g) {
   var pending = H.pending.shopping[g.id];
-  return '<div class="s-row"><button class="s-hit" data-check="' + App.esc(g.id) + '" ' + (pending ? 'disabled' : '') + '><span class="s-box live-shopping-check' + (g.checked ? ' is-done' : '') + '">' + (pending ? '…' : g.checked ? '✓' : '') + '</span>' + photo(g, 'product-photo--list') + '<span class="s-name"><b>' + App.esc(g.name) + '</b><small>' + (pending ? 'Saving…' : App.esc(g.note || g.unit || '')) + '</small></span></button><div class="s-qty"><button data-qty="-1" data-id="' + App.esc(g.id) + '" aria-label="Decrease quantity" ' + (pending || g.quantity <= 1 ? 'disabled' : '') + '>' + App.icon('minus', 22) + '</button><span class="num">' + g.quantity + '</span><button data-qty="1" data-id="' + App.esc(g.id) + '" aria-label="Increase quantity" ' + (pending || g.quantity >= 999 ? 'disabled' : '') + '>' + App.icon('plus', 22) + '</button></div></div>';
+  return '<div class="s-row" data-row-id="' + App.esc(g.id) + '"><button class="s-hit" data-check="' + App.esc(g.id) + '" ' + (pending ? 'disabled' : '') + '><span class="s-box live-shopping-check' + (g.checked ? ' is-done' : '') + '">' + (pending ? '…' : g.checked ? '✓' : '') + '</span>' + photo(g, 'product-photo--list') + '<span class="s-name"><b>' + App.esc(g.name) + '</b><small>' + (pending ? pending === 'remove' ? 'Removing…' : 'Saving…' : App.esc(g.note || g.unit || '')) + '</small></span></button><div class="s-qty"><button data-qty="-1" data-id="' + App.esc(g.id) + '" aria-label="Decrease quantity" ' + (pending || g.quantity <= 1 ? 'disabled' : '') + '>' + App.icon('minus', 22) + '</button><span class="num">' + g.quantity + '</span><button data-qty="1" data-id="' + App.esc(g.id) + '" aria-label="Increase quantity" ' + (pending || g.quantity >= 999 ? 'disabled' : '') + '>' + App.icon('plus', 22) + '</button></div><button class="s-remove" data-remove="' + App.esc(g.id) + '" aria-label="Remove ' + App.esc(g.name) + '" ' + (pending ? 'disabled' : '') + '>' + App.icon('trash', 25) + '</button></div>';
  }
  function quantity(id) { return D.groceries.reduce(function (sum, g) { return sum + (!g.checked && g.usualItemId === id ? g.quantity : 0); }, 0); }
  function tileState(button) {
@@ -65,7 +65,28 @@
   if (!V.el) return; var sc = V.el.querySelector('.s-list'), top = sc ? sc.scrollTop : 0;
   var items = D.groceries.filter(function (g) { return g.checked === V.checked; });
   var groups = D.catOrder.all.map(function (cat) { return { cat: cat, items: items.filter(function (g) { return g.category === cat; }) }; }).filter(function (group) { return group.items.length; });
-  V.el.querySelector('.live-shopping-list').innerHTML = H.statusHTML('shopping') + (items.length ? groups.map(function (group) { return '<div class="s-cat"><div class="s-cat-h"><span class="label">' + App.esc(group.cat) + '</span><span class="label">' + group.items.length + '</span></div>' + group.items.map(row).join('') + '</div>'; }).join('') : '<p class="live-empty serif">' + (H.states.shopping.data ? V.checked ? 'No checked items.' : 'Your shopping list is empty.' : 'Shopping not connected yet.') + '</p>');
+  V.el.querySelector('.live-shopping-status').innerHTML = H.statusHTML('shopping');
+  // Keep existing product images, focus and row nodes during pending/quantity edits.
+  var signature = JSON.stringify([V.checked, !!H.states.shopping.data, groups.map(function (group) { return [group.cat, group.items.map(function (g) { return [g.id, g.imageUrl || (g.usualItemId && usual(g.usualItemId) || {}).imageUrl]; })]; })]);
+  if (signature !== V.listSignature) {
+   V.el.querySelector('.live-shopping-items').innerHTML = items.length ? groups.map(function (group) { return '<div class="s-cat"><div class="s-cat-h"><span class="label">' + App.esc(group.cat) + '</span><span class="label">' + group.items.length + '</span></div>' + group.items.map(row).join('') + '</div>'; }).join('') : '<p class="live-empty serif">' + (H.states.shopping.data ? V.checked ? 'No checked items.' : 'Your shopping list is empty.' : 'Shopping not connected yet.') + '</p>';
+   V.listSignature = signature;
+  } else {
+   V.el.querySelectorAll('[data-row-id]').forEach(function (el) {
+    var g = items.filter(function (g) { return g.id === el.dataset.rowId; })[0]; if (!g) return;
+    var pending = H.pending.shopping[g.id];
+    el.querySelector('[data-check]').disabled = !!pending;
+    el.querySelector('.s-box').textContent = pending ? '…' : g.checked ? '✓' : '';
+    el.querySelector('.s-box').classList.toggle('is-done', g.checked);
+    el.querySelector('.s-name b').textContent = g.name;
+    el.querySelector('.s-name small').textContent = pending ? pending === 'remove' ? 'Removing…' : 'Saving…' : g.note || g.unit || '';
+    el.querySelector('.s-qty .num').textContent = g.quantity;
+    el.querySelector('[data-qty="-1"]').disabled = !!pending || g.quantity <= 1;
+    el.querySelector('[data-qty="1"]').disabled = !!pending || g.quantity >= 999;
+    el.querySelector('[data-remove]').disabled = !!pending;
+    el.querySelector('[data-remove]').setAttribute('aria-label', 'Remove ' + g.name);
+   });
+  }
   V.el.querySelector('.s-count').textContent = H.states.shopping.data ? D.groceries.filter(function (g) { return !g.checked; }).length + ' items to get' : '';
   V.el.querySelector('[data-checked]').textContent = V.checked ? 'Show unfinished' : 'Checked items';
   V.el.querySelector('[data-open-usuals]').disabled = !H.states.shopping.data || !D.usuals.length;
@@ -76,7 +97,7 @@
  }
  function render() {
   if (!V.el.firstChild) {
-   V.el.innerHTML = '<div class="shop"><header class="s-head"><div><div class="label">Shared shopping list</div><h1 class="serif">Shopping</h1></div><div class="s-count"></div><button class="btn" data-checked>Checked items</button></header><div class="s-list live-shopping-list"></div><aside class="s-side"><form class="s-add live-shopping-add"><label class="s-input-wrap">' + App.icon('plus', 26) + '<input class="s-input" maxlength="240" placeholder="Add an item…" required autocomplete="off"></label><button class="btn btn--solid" type="submit">Add item</button></form><button class="usual-open" data-open-usuals>' + App.icon('cart', 40) + '<b>Add usual items</b><span class="usual-catalog-count"></span>' + App.icon('plus', 28) + '</button></aside></div>';
+   V.el.innerHTML = '<div class="shop"><header class="s-head"><div><div class="label">Shared shopping list</div><h1 class="serif">Shopping</h1></div><div class="s-count"></div><button class="btn" data-checked>Checked items</button></header><div class="s-list live-shopping-list"><div class="live-shopping-status"></div><div class="live-shopping-items"></div></div><aside class="s-side"><form class="s-add live-shopping-add"><label class="s-input-wrap">' + App.icon('plus', 26) + '<input class="s-input" maxlength="240" placeholder="Add an item…" required autocomplete="off"></label><button class="btn btn--solid" type="submit">Add item</button></form><button class="usual-open" data-open-usuals>' + App.icon('cart', 40) + '<b>Add usual items</b><span class="usual-catalog-count"></span>' + App.icon('plus', 28) + '</button></aside></div>';
    var input = V.el.querySelector('input'); input.value = V.query;
    input.oninput = function () { V.query = input.value; };
    V.el.addEventListener('error', imageError, true);
@@ -89,7 +110,8 @@
  function click(e) { var b = e.target.closest('button'); if (!b || b.disabled) return;
   if (b.hasAttribute('data-open-usuals')) return openPicker();
   if (b.hasAttribute('data-checked')) { V.checked = !V.checked; return paint(); }
-  var id = b.dataset.check || b.dataset.id, g = D.groceries.filter(function (g) { return g.id === id; })[0]; if (!g) return;
+  var id = b.dataset.remove || b.dataset.check || b.dataset.id, g = D.groceries.filter(function (g) { return g.id === id; })[0]; if (!g) return;
+  if (b.dataset.remove) { H.write('shopping', 'remove', { id: g.id }, g.id).then(function () { App.toast('Item removed from shopping list', { icon: 'cart' }); }, error); return; }
   var body = { id: g.id }; if (b.dataset.check) body.checked = !g.checked; else if (b.dataset.qty) body.quantity = Math.max(1, Math.min(999, g.quantity + +b.dataset.qty)); else return;
   H.write('shopping', 'update', body, g.id).catch(error);
  }

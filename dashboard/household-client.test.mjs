@@ -40,3 +40,9 @@ test('changing the viewed chore week during a save cannot replace it with an old
  f.requests[3].reply({...chores(false),weekStart:'2026-10-12',weekEnd:'2026-10-18',occurrences:[],today:'2026-10-11'});f.requests[4].reply({...chores(true),today:'2026-10-11'});await tick();
  assert.equal(f.H.states.chores.data.weekStart,'2026-10-12');assert.equal(f.H.todayChores.occurrences[0].completed,true);
 });
+test('an edit aborts stale polls and a compact confirmed removal retains the usual catalog',async()=>{
+ const f=fixture();const initial=f.H.refresh('shopping'),catalog=[{id:'usual',name:'Example'}];f.requests[0].reply({items:[{id:'item',name:'Example',quantity:1,checked:false,category:'Other'}],usualItems:catalog});await initial;
+ const poll=f.H.refresh('shopping'),old=f.requests[1];let aborted=false;old.abort=()=>{aborted=true;old.onabort();};
+ const removal=f.H.write('shopping','remove',{id:'item'},'item');assert.equal(aborted,true);await tick();assert.equal(f.requests[2].url,'/api/household/shopping/remove');
+ f.requests[2].status=200;f.requests[2].responseText=JSON.stringify({data:{items:[],updatedAt:'2026-10-11T00:00:00Z'},partial:true,controlKey:'test-control'});f.requests[2].onload();await Promise.all([poll,removal]);assert.equal(f.DATA.groceries.length,0);assert.equal(f.DATA.usuals.length,1);assert.equal(f.H.states.shopping.error,null);assert.equal(f.H.hasPending(),false);
+});

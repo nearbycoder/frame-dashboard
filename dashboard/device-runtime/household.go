@@ -5,6 +5,7 @@ import (
 	"crypto/subtle"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -90,6 +91,8 @@ func validateHousehold(action string, a map[string]any) error {
 		_, name := a["name"]
 		_, usual := a["usualItemId"]
 		valid = only(a, "name", "usualItemId", "quantity", "note") && name != usual && textArg(a, "name", 240, name) && textArg(a, "usualItemId", 100, usual) && numberArg(a, "quantity", false) && textArg(a, "note", 500, false)
+	case "remove":
+		valid = only(a, "id") && idArg(a, "id", false)
 	case "update":
 		_, q := a["quantity"]
 		c, checked := a["checked"]
@@ -131,6 +134,59 @@ func validHousehold(domain string, v map[string]any) bool {
 	}
 	return false
 }
+
+// Shopping writes return the committed list. Validate the requested edit before
+// avoiding the redundant full read; older or mismatched acknowledgments fall back.
+func confirmedShopping(action string, input, data map[string]any) bool {
+	if !validHousehold("shopping", data) {
+		return false
+	}
+	stamp, ok := data["updatedAt"].(string)
+	if !ok {
+		return false
+	}
+	if _, err := time.Parse(time.RFC3339Nano, stamp); err != nil {
+		return false
+	}
+	for _, raw := range data["items"].([]any) {
+		item, ok := raw.(map[string]any)
+		if !ok {
+			return false
+		}
+		if _, ok := item["id"].(string); !ok {
+			return false
+		}
+		if action == "remove" && item["id"] == input["id"] {
+			return false
+		}
+		if action == "update" && item["id"] == input["id"] {
+			if item["updatedAt"] != stamp {
+				return false
+			}
+			for _, k := range []string{"quantity", "checked", "note"} {
+				if v, exists := input[k]; exists && item[k] != v {
+					return false
+				}
+			}
+			return true
+		}
+		if action == "add" && item["checked"] == false && item["updatedAt"] == stamp {
+			match := item["usualItemId"] == input["usualItemId"]
+			if name, ok := input["name"].(string); ok {
+				match = item["name"] == strings.TrimSpace(name)
+			}
+			quantity, ok := item["quantity"].(float64)
+			want, exists := input["quantity"].(float64)
+			if !exists {
+				want = 1
+			}
+			if match && ok && quantity >= want && item["note"] == input["note"] {
+				return true
+			}
+		}
+	}
+	return action == "remove"
+}
 func (b *bridge) handleHousehold(w http.ResponseWriter, r *http.Request) {
 	parts := strings.Split(strings.TrimPrefix(r.URL.Path, "/api/household/"), "/")
 	tools := map[string]string{"calendar": "calendar_events_list", "chores": "chores_list", "shopping": "shopping_list_get", "weather": "weather_forecast_get", "time": "date_time_get"}
@@ -151,7 +207,7 @@ func (b *bridge) handleHousehold(w http.ResponseWriter, r *http.Request) {
 		args["weekStart"] = week
 	}
 	if r.Method == "POST" {
-		if len(parts) != 2 || ((domain != "chores" || !(parts[1] == "complete" || parts[1] == "create")) && (domain != "shopping" || !(parts[1] == "add" || parts[1] == "update"))) {
+		if len(parts) != 2 || ((domain != "chores" || !(parts[1] == "complete" || parts[1] == "create")) && (domain != "shopping" || !(parts[1] == "add" || parts[1] == "update" || parts[1] == "remove"))) {
 			sendJSON(w, 405, map[string]string{"error": "This operation is not supported."})
 			return
 		}
@@ -169,23 +225,38 @@ func (b *bridge) handleHousehold(w http.ResponseWriter, r *http.Request) {
 			sendJSON(w, 400, map[string]string{"error": "Choose valid household settings."})
 			return
 		}
+		queued := time.Now()
 		lock := b.householdLock(domain)
 		lock.Lock()
 		defer lock.Unlock()
-		writeTool := map[string]string{"chores/complete": "chores_complete", "chores/create": "chores_create", "shopping/add": "shopping_list_add", "shopping/update": "shopping_list_update"}[domain+"/"+parts[1]]
+		waited := time.Since(queued)
+		writeStarted := time.Now()
+		writeTool := map[string]string{"chores/complete": "chores_complete", "chores/create": "chores_create", "shopping/add": "shopping_list_add", "shopping/update": "shopping_list_update", "shopping/remove": "shopping_list_remove"}[domain+"/"+parts[1]]
 		var ack map[string]any
 		if b.rpc(ctx, writeTool, input, &ack) != nil {
 			sendJSON(w, 503, map[string]string{"error": "The change was not confirmed. Refresh to check before trying again."})
 			return
 		}
-		// Read after each write; never turn an optimistic preview into saved state.
-		var value map[string]any
-		if b.rpc(ctx, tool, args, &value) != nil || !validHousehold(domain, value) {
-			sendJSON(w, 503, map[string]string{"error": "Could not verify the saved state. Refresh before trying again."})
-			return
+		written := time.Since(writeStarted)
+		value := ack
+		readTime := time.Duration(0)
+		if domain != "shopping" || !confirmedShopping(parts[1], input, ack) {
+			readStarted := time.Now()
+			value = nil
+			if b.rpc(ctx, tool, args, &value) != nil || !validHousehold(domain, value) {
+				sendJSON(w, 503, map[string]string{"error": "Could not verify the saved state. Refresh before trying again."})
+				return
+			}
+			readTime = time.Since(readStarted)
 		}
 		delete(value, "orders")
-		sendJSON(w, 200, map[string]any{"data": value, "controlKey": b.key})
+		w.Header().Set("Server-Timing", fmt.Sprintf("queue;dur=%.1f, write;dur=%.1f, read;dur=%.1f", float64(waited)/float64(time.Millisecond), float64(written)/float64(time.Millisecond), float64(readTime)/float64(time.Millisecond)))
+		result := map[string]any{"data": value, "controlKey": b.key}
+		if domain == "shopping" && r.Header.Get("X-Household-Compact") == "1" {
+			result["data"] = map[string]any{"items": value["items"], "updatedAt": value["updatedAt"]}
+			result["partial"] = true
+		}
+		sendJSON(w, 200, result)
 		return
 	}
 	if r.Method != "GET" || len(parts) != 1 {

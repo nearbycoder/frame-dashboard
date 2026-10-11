@@ -5,7 +5,7 @@
   var names = ['calendar', 'chores', 'shopping', 'weather', 'time'];
   var H = App.household = { key: null, states: {}, pending: {}, params: {}, clock: null };
   names.forEach(function (name) { H.states[name] = { data: null, loading: false, error: null, generation: 0, synced: null }; H.pending[name] = {}; });
-  var queues = {}, inflight = {}, mono = function () { return performance.now(); };
+  var queues = {}, inflight = {}, reads = {}, mono = function () { return performance.now(); };
   var central = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' });
   App.toCentralDate = function (value) {
     if (/^\d{4}-\d{2}-\d{2}$/.test(String(value))) { var a = String(value).split('-'); return new Date(+a[0], +a[1] - 1, +a[2]); }
@@ -20,15 +20,25 @@
     var requestedWeek = arguments.length === 5 ? week : H.params[domain];
     var query = requestedWeek ? '?weekStart=' + encodeURIComponent(requestedWeek) : '';
     return new Promise(function (resolve, reject) {
-      var xhr = new XMLHttpRequest(); xhr.open(method, '/api/household/' + domain + (action ? '/' + action : '') + query); xhr.timeout = 60000;
-      if (body) { xhr.setRequestHeader('Content-Type', 'application/json'); xhr.setRequestHeader('X-Household-Control', H.key || ''); }
+      var xhr = new XMLHttpRequest();
+      if (method === 'GET') (reads[domain] || (reads[domain] = [])).push(xhr);
+      function untrack() { if (method === 'GET') reads[domain] = (reads[domain] || []).filter(function (r) { return r !== xhr; }); }
+      xhr.onabort = function () { untrack(); reject(new Error('Read cancelled for a newer change.')); };
+      xhr.open(method, '/api/household/' + domain + (action ? '/' + action : '') + query); xhr.timeout = 60000;
+      if (body) { xhr.setRequestHeader('Content-Type', 'application/json'); xhr.setRequestHeader('X-Household-Control', H.key || ''); if (domain === 'shopping') xhr.setRequestHeader('X-Household-Compact', '1'); }
       xhr.onload = function () {
+        untrack();
         var result; try { result = JSON.parse(xhr.responseText); } catch (_) { return reject(new Error('Live data returned an invalid response.')); }
         if (xhr.status !== 200 || !result.data) return reject(new Error(result.error || 'Live data is unavailable.'));
+        if (result.partial === true) {
+          var previous = H.states[domain].data;
+          if (domain !== 'shopping' || method !== 'POST' || !previous || !Array.isArray(previous.usualItems) || !Array.isArray(result.data.items)) return reject(new Error('Saved shopping state was incomplete. Refresh before retrying.'));
+          result.data = Object.assign({}, previous, result.data, { usualItems: previous.usualItems });
+        }
         if (typeof result.controlKey === 'string') H.key = result.controlKey;
         resolve(result.data);
       };
-      xhr.onerror = xhr.ontimeout = function () { reject(new Error(body ? 'The change was not confirmed. Refresh before retrying.' : 'Connection lost. Showing the last confirmed data.')); };
+      xhr.onerror = xhr.ontimeout = function () { untrack(); reject(new Error(body ? 'The change was not confirmed. Refresh before retrying.' : 'Connection lost. Showing the last confirmed data.')); };
       xhr.send(body ? JSON.stringify(body) : null);
     });
   }
@@ -75,7 +85,11 @@
     if (!H.key) return Promise.reject(new Error('Wait for live data to connect before making changes.'));
     var state = H.states[domain], key = id || action;
     if (H.pending[domain][key]) return Promise.reject(new Error('This change is still being saved.'));
-    H.pending[domain][key] = true; state.generation++; state.loading = false; emit(domain);
+    H.pending[domain][key] = action; state.generation++; state.loading = false;
+    // Invalidating a poll is not enough: cancel its network work so a queued edit
+    // cannot sit behind a discarded full-list download in the runtime's lock.
+    (reads[domain] || []).slice().forEach(function (xhr) { if (xhr.abort) xhr.abort(); });
+    emit(domain);
     var task = (queues[domain] || Promise.resolve()).then(function () {
       var started = mono(), requestWeek = H.params[domain];
       return request('POST', domain, action, body).then(function (data) { if (requestWeek === H.params[domain]) { sync(domain, data, started); state.data = data; state.error = null; state.synced = Date.now(); } });
