@@ -9,6 +9,11 @@ public class NetworkBootReceiver extends BroadcastReceiver {
     if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())
         && context.getSharedPreferences("network", Context.MODE_PRIVATE).getBoolean("tailscale", false)) {
       context.startService(new Intent(context, TailnetService.class));
+      Intent dashboard = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName());
+      if (dashboard != null) {
+        dashboard.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(dashboard);
+      }
     }
   }
 }

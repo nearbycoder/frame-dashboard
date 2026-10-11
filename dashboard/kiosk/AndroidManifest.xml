@@ -12,7 +12,7 @@
       android:usesCleartextTraffic="true"
       android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
     <service android:name=".TailnetService" android:exported="false" />
-    <receiver android:name=".NetworkBootReceiver" android:exported="false">
+    <receiver android:name=".NetworkBootReceiver" android:exported="true">
       <intent-filter><action android:name="android.intent.action.BOOT_COMPLETED" /></intent-filter>
     </receiver>
     <activity

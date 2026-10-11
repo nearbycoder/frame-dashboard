@@ -43,7 +43,7 @@ The frame still needs to reach the server for lights and update downloads; GitHu
 
 The standard Tailscale Android app requires Android 8+. On this rooted Android 6 frame, the official static Linux ARM client runs instead. Its binaries and login state live under `/data/local/tailscale/` with root-only access; none are included in Git or dashboard bundles. The daemon needs `/dev/net/tun` linked to Android's `/dev/tun` and a Wi-Fi policy route for its underlay mark.
 
-Kiosk 1.2.1 has an opt-in foreground service and boot receiver to keep the installed daemon running independently of USB. After installing the binaries and authorizing the frame in the computer's tailnet, enable it with:
+Kiosk 1.2.2 has an opt-in foreground service and boot receiver to keep the installed daemon running independently of USB and reopen the dashboard at boot. After installing the binaries and authorizing the frame in the computer's tailnet, enable it with:
 
 ```sh
 adb shell am start -n com.wesbos.homehq/.MainActivity --ez tailscale true
