@@ -1,3 +1,4 @@
+import { desktopSettings } from './device-settings-server.mjs';
 import { createForecast } from './forecast.mjs';
 // Local dashboard + bounded demo-image proxy for legacy Android frames.
 // Upstream TLS is checked by Node; the frame receives assets over Wi-Fi or its USB localhost link.
@@ -83,6 +84,7 @@ async function image(key) {
 const server = http.createServer(async (request, response) => {
   try {
     const url = new URL(request.url, 'http://localhost');
+    if (desktopSettings(request, response, url)) return;
     if (await products(request, response, url)) return;
     if (await lights.handle(request, response, url)) return;
     if (await forecast.handle(request, response, url)) return;
