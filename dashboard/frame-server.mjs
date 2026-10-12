@@ -1,3 +1,4 @@
+import { createPhotoImages } from './photos.mjs';
 import { desktopSettings } from './device-settings-server.mjs';
 import { createForecast } from './forecast.mjs';
 // Local dashboard + bounded demo-image proxy for legacy Android frames.
@@ -19,7 +20,9 @@ const port = Number(process.env.FRAME_PORT || 4173);
 const hosts = new Set(['picsum.photos', 'fastly.picsum.photos']);
 const cache = new Map();
 const pending = new Map();
-const lights = createRingBridge({ authorization: keyringAuthorization() });
+const authorization = keyringAuthorization();
+const lights = createRingBridge({ authorization });
+const photos = createPhotoImages({ authorization });
 const household = createHouseholdBridge({ rpc: lights.rpc });
 const products = createProductImages();
 const forecast = createForecast();
@@ -84,6 +87,7 @@ async function image(key) {
 const server = http.createServer(async (request, response) => {
   try {
     const url = new URL(request.url, 'http://localhost');
+    if (await photos(request, response, url)) return;
     if (desktopSettings(request, response, url)) return;
     if (await products(request, response, url)) return;
     if (await lights.handle(request, response, url)) return;

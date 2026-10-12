@@ -128,6 +128,8 @@ func validHousehold(domain string, v map[string]any) bool {
 	case "weather":
 		s, _ := v["status"].(string)
 		return arr("periods") && (s == "ready" || s == "stale" || s == "unavailable") && v["temperatureUnit"] == "F"
+	case "photos":
+		return validPhotos(v)
 	case "time":
 		n, ok := v["unixMs"].(float64)
 		return ok && n > 0 && v["timeZone"] == "America/Chicago"
@@ -189,7 +191,7 @@ func confirmedShopping(action string, input, data map[string]any) bool {
 }
 func (b *bridge) handleHousehold(w http.ResponseWriter, r *http.Request) {
 	parts := strings.Split(strings.TrimPrefix(r.URL.Path, "/api/household/"), "/")
-	tools := map[string]string{"calendar": "calendar_events_list", "chores": "chores_list", "shopping": "shopping_list_get", "weather": "weather_forecast_get", "time": "date_time_get"}
+	tools := map[string]string{"calendar": "calendar_events_list", "chores": "chores_list", "shopping": "shopping_list_get", "weather": "weather_forecast_get", "time": "date_time_get", "photos": "photos_list"}
 	domain := parts[0]
 	tool, ok := tools[domain]
 	if !ok {
@@ -199,6 +201,10 @@ func (b *bridge) handleHousehold(w http.ResponseWriter, r *http.Request) {
 	ctx, cancel := context.WithTimeout(r.Context(), 55*time.Second)
 	defer cancel()
 	args := map[string]any{}
+	if domain == "photos" {
+		args["limit"] = 100
+		args["offset"] = 0
+	}
 	if week := r.URL.Query().Get("weekStart"); week != "" {
 		if domain != "chores" || !validDate(week) {
 			sendJSON(w, 400, map[string]string{"error": "Choose a valid chore week."})

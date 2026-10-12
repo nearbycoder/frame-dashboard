@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   var D = window.DATA;
-  var names = ['calendar', 'chores', 'shopping', 'weather', 'time', 'forecast'];
+  var names = ['calendar', 'chores', 'shopping', 'weather', 'time', 'forecast', 'photos'];
   var H = App.household = { key: null, states: {}, pending: {}, params: {}, clock: null };
   names.forEach(function (name) { H.states[name] = { data: null, loading: false, error: null, generation: 0, synced: null }; H.pending[name] = {}; });
   var queues = {}, inflight = {}, reads = {}, mono = function () { return performance.now(); };
@@ -66,6 +66,10 @@
       D.groceries = value.items.map(function (g) { return Object.assign({}, g, { done: g.checked, qty: g.quantity, cat: g.category }); });
       D.usuals = value.usualItems;
     }
+    if (domain === 'photos') {
+      if (!Array.isArray(value.photos) || !Array.isArray(value.sources) || value.photos.length > 100 || value.photos.some(function (p) { return !/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(p.id || '') || p.imagePath !== '/api/photos/items/' + p.id + '/image'; })) throw new Error('Photos returned invalid data.');
+      D.photos = value.photos; D.photoGallery = value;
+    }
     if (domain === 'forecast') { if (!Array.isArray(value.periods) || value.temperatureUnit !== 'F') throw new Error('Forecast returned invalid data.'); D.forecast = value; }
     if (domain === 'weather') { if (!Array.isArray(value.periods) || value.temperatureUnit !== 'F') throw new Error('Weather returned invalid data.'); D.weather = value; }
   }
@@ -126,7 +130,7 @@
   App.on('ready', function () {
     names.forEach(function (name) { H.refresh(name); });
     var seconds = 0;
-    setInterval(function () { if (document.hidden) return; seconds += 60; ['time', 'chores', 'shopping'].forEach(function (name) { H.refresh(name); }); H.refreshTodayChores(); if (seconds % 300 === 0) H.refresh('calendar'); if (seconds % 900 === 0) { H.refresh('weather'); H.refresh('forecast'); } }, 60000);
+    setInterval(function () { if (document.hidden) return; seconds += 60; ['time', 'chores', 'shopping', 'photos'].forEach(function (name) { H.refresh(name); }); H.refreshTodayChores(); if (seconds % 300 === 0) H.refresh('calendar'); if (seconds % 900 === 0) { H.refresh('weather'); H.refresh('forecast'); } }, 60000);
     document.addEventListener('visibilitychange', function () { if (!document.hidden) names.forEach(function (name) { H.refresh(name); }); });
     document.addEventListener('click', function (e) { var b = e.target.closest('[data-refresh]'); if (b) H.refresh(b.dataset.refresh); });
   });

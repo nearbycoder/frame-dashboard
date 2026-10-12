@@ -12,6 +12,7 @@ import './views/calendar.js';
 import './views/weather.js';
 import './views/tasks.js';
 import './views/shopping.js';
+import './photos.js';
 import './views/photos.js';
 import './views/lights.js';
 import './views/ambient.js';

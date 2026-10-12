@@ -58,3 +58,9 @@ test('forecast refresh requests fresh provider data and rejects a late obsolete 
  assert.equal(f.requests[1].url,'/api/household/forecast?refresh=1');const data={temperatureUnit:'F',periods:[],status:'ready',fetchedAt:'2026-10-11T20:00:00Z'};f.requests[1].reply(data);await Promise.all([old,fresh]);assert.equal(f.DATA.forecast.fetchedAt,data.fetchedAt);
  f.requests[0].reply({...data,fetchedAt:'2026-10-10T20:00:00Z'});await tick();assert.equal(f.DATA.forecast.fetchedAt,data.fetchedAt);assert.equal(f.H.states.forecast.error,null);
 });
+
+test('photo polling applies new arrivals and a failed read retains the last confirmed gallery',async()=>{
+ const f=fixture(),photo={id,imagePath:'/api/photos/items/'+id+'/image',title:'Example',fileName:'image.jpg'};let task=f.H.refresh('photos');f.requests[0].reply({photos:[photo],sources:[],total:1});await task;assert.equal(f.DATA.photos.length,1);
+ task=f.H.refresh('photos');f.requests[1].reply({photos:[{...photo,id:'00000000-0000-4000-8000-000000000002',imagePath:'/api/photos/items/00000000-0000-4000-8000-000000000002/image'},photo],sources:[],total:2});await task;assert.equal(f.DATA.photos.length,2);
+ task=f.H.refresh('photos');f.requests[2].fail();await task;assert.equal(f.DATA.photos.length,2);assert.ok(f.H.states.photos.error);
+});

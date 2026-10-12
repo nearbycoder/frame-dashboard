@@ -55,6 +55,7 @@ func secureClient(dns string, redirects bool) *http.Client {
 }
 func handler(s *releases, b *bridge, client *http.Client) http.Handler {
 	products := productImages(client)
+	photos := b.photoImages()
 	settings := newDeviceSettings(b.key)
 	forecastClient := *client
 	forecastClient.CheckRedirect = func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse }
@@ -68,6 +69,10 @@ func handler(s *releases, b *bridge, client *http.Client) http.Handler {
 			return
 		}
 		w.Header().Set("X-Content-Type-Options", "nosniff")
+		if strings.HasPrefix(r.URL.Path, "/photo-image/") {
+			photos.ServeHTTP(w, r)
+			return
+		}
 		if strings.HasPrefix(r.URL.Path, "/api/device-settings") {
 			settings.ServeHTTP(w, r)
 			return

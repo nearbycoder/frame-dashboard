@@ -259,7 +259,7 @@
     idleSec++;
     var blocked = $('#sheetLayer').classList.contains('is-open') || (App.household && App.household.hasPending()) || (document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName));
     if (App.mode === 'nightdash' && idleSec >= 20) { App.setMode('night'); return; }
-    if (App.mode !== 'day' || blocked) return;
+    if (App.mode !== 'day' || blocked || App.current === 'photos') return;
     if (idleSec === App.idle.home && App.current !== 'home') { App.closeSheet(); App.go('home'); }
     if (idleSec >= App.idle.ambient) {
       App.closeSheet();

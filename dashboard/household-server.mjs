@@ -1,7 +1,8 @@
+import {validPhotos} from './photos.mjs';
 // Optional desktop bridge mirrors the on-device household endpoints.
 import { randomBytes, timingSafeEqual } from 'node:crypto';
 import { networkInterfaces } from 'node:os';
-const tools={calendar:'calendar_events_list',chores:'chores_list',shopping:'shopping_list_get',weather:'weather_forecast_get',time:'date_time_get'};
+const tools={calendar:'calendar_events_list',chores:'chores_list',shopping:'shopping_list_get',weather:'weather_forecast_get',time:'date_time_get',photos:'photos_list'};
 const writes={'chores/complete':'chores_complete','chores/create':'chores_create','shopping/add':'shopping_list_add','shopping/update':'shopping_list_update','shopping/remove':'shopping_list_remove'};
 const uuid=v=>typeof v==='string'&&/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(v);
 const date=v=>typeof v==='string'&&/^20\d{2}-\d{2}-\d{2}$/.test(v)&&!isNaN(Date.parse(v+'T12:00:00Z'))&&new Date(v+'T12:00:00Z').toISOString().slice(0,10)===v;
@@ -21,7 +22,7 @@ export function validateHousehold(action,a){
  if(action==='remove')valid=only(a,['id'])&&text('id',100,true);
  if(!valid)throw Error('Choose valid household settings.');return a;
 }
-function valid(domain,data){if(!data||Array.isArray(data)||typeof data!=='object')return false;const arr=k=>Array.isArray(data[k]);return {calendar:()=>arr('sources')&&arr('events'),chores:()=>arr('people')&&arr('occurrences')&&arr('overdue'),shopping:()=>arr('items')&&arr('usualItems'),weather:()=>arr('periods')&&['ready','stale','unavailable'].includes(data.status)&&data.temperatureUnit==='F',time:()=>Number.isFinite(data.unixMs)&&data.unixMs>0&&data.timeZone==='America/Chicago'}[domain]();}
+function valid(domain,data){if(!data||Array.isArray(data)||typeof data!=='object')return false;const arr=k=>Array.isArray(data[k]);return {calendar:()=>arr('sources')&&arr('events'),chores:()=>arr('people')&&arr('occurrences')&&arr('overdue'),shopping:()=>arr('items')&&arr('usualItems'),weather:()=>arr('periods')&&['ready','stale','unavailable'].includes(data.status)&&data.temperatureUnit==='F',photos:()=>validPhotos(data),time:()=>Number.isFinite(data.unixMs)&&data.unixMs>0&&data.timeZone==='America/Chicago'}[domain]();}
 // Ring commits shopping and returns the resulting snapshot in one transaction.
 // Accept it only when the requested edit is present; older acknowledgments use a read.
 export function confirmedShopping(action, input, data) {
@@ -47,7 +48,7 @@ export function createHouseholdBridge({rpc}){
   try{
    const own=new URL('http://'+request.headers.host);if(!hosts.has(own.hostname)){send(403,{error:'Host not allowed.'});return true;}
    if(!Object.hasOwn(tools,domain)){send(404,{error:'Unknown household page.'});return true;}
-   const args={},week=url.searchParams.get('weekStart');if(week){if(domain!=='chores'||!date(week)){send(400,{error:'Choose a valid chore week.'});return true;}args.weekStart=week;}
+   const args=domain==='photos'?{limit:100,offset:0}:{},week=url.searchParams.get('weekStart');if(week){if(domain!=='chores'||!date(week)){send(400,{error:'Choose a valid chore week.'});return true;}args.weekStart=week;}
    if(request.method==='GET'&&!action&&!extra.length){const data=await serialize(domain,()=>rpc(tools[domain],args));if(!valid(domain,data))throw Error();delete data.orders;send(200,{data,controlKey:key});return true;}
    if(request.method!=='POST'||!writes[domain+'/'+action]||extra.length){send(405,{error:'This operation is not supported.'});return true;}
    const supplied=Buffer.from(String(request.headers['x-household-control']||''));if(request.headers.origin!==own.origin||supplied.length!==key.length||!timingSafeEqual(supplied,Buffer.from(key))){send(403,{error:'Refresh before making changes.'});return true;}
