@@ -6,12 +6,25 @@ const source=readFileSync(new URL('./js/household.js',import.meta.url),'utf8');
 const tick=()=>new Promise(resolve=>setImmediate(resolve));
 const id='00000000-0000-4000-8000-000000000001';
 const chores=completed=>({people:[{id,name:'Example'}],occurrences:[{choreId:id,personId:id,title:'Example chore',date:'2026-10-11',repeat:'once',completed}],overdue:[],weekStart:'2026-10-05',weekEnd:'2026-10-11'});
-function fixture(){const requests=[],handlers={},DATA={};let elapsed=0;
+function fixture(){const requests=[],handlers={},timers=[],listeners={},document={hidden:false,addEventListener:(name,fn)=>listeners[name]=fn},DATA={};let elapsed=0;
  class XHR{open(method,url){this.method=method;this.url=url;}setRequestHeader(){}send(body){this.body=body&&JSON.parse(body);requests.push(this);}reply(data,status=200){this.status=status;this.responseText=JSON.stringify({data,controlKey:'test-control'});this.onload();}fail(){this.onerror();}}
  const App={on:(n,fn)=>handlers[n]=fn,emit(){},esc:String};
- vm.runInNewContext(source,{window:{DATA},App,XMLHttpRequest:XHR,Intl,Date,Promise,Object,performance:{now:()=>elapsed},document:{hidden:false,addEventListener(){}},setInterval(){}});
- return {H:App.household,App,DATA,requests,advance:n=>elapsed+=n};
+ vm.runInNewContext(source,{window:{DATA},App,XMLHttpRequest:XHR,Intl,Date,Promise,Object,performance:{now:()=>elapsed},document,setInterval:(fn,ms)=>timers.push({fn,ms})});
+ return {H:App.household,App,DATA,requests,handlers,timers,listeners,document,advance:n=>elapsed+=n};
 }
+test('background household reads run every five minutes, weather every fifteen, with immediate startup and foreground reads',()=>{
+ const f=fixture(),reads=[];let todayReads=0;
+ const all=['calendar','chores','shopping','weather','time','forecast','photos'];
+ const routine=['time','chores','shopping','photos','calendar'];
+ f.H.refresh=name=>reads.push(name);f.H.refreshTodayChores=()=>todayReads++;
+ f.handlers.ready();assert.deepEqual(reads,all);reads.length=0;
+ assert.equal(f.timers.length,1);assert.equal(f.timers[0].ms,300000);
+ f.timers[0].fn();assert.deepEqual(reads,routine);reads.length=0;
+ f.document.hidden=true;f.timers[0].fn();assert.equal(reads.length,0);
+ f.document.hidden=false;f.timers[0].fn();assert.deepEqual(reads,routine);reads.length=0;
+ f.timers[0].fn();assert.deepEqual(reads,routine.concat(['weather','forecast']));assert.equal(todayReads,3);reads.length=0;
+ f.listeners.visibilitychange();assert.deepEqual(reads,all);
+});
 test('delayed polling cannot overwrite a confirmed checkoff; failed writes never fabricate completion or retry',async()=>{
  const f=fixture();await (async()=>{const p=f.H.refresh('chores');f.requests[0].reply(chores(false));await p;})();
  const poll=f.H.refresh('chores');const write=f.H.write('chores','complete',{choreId:id,date:'2026-10-11',completed:true},id);await tick();

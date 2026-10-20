@@ -26,3 +26,15 @@ test('slideshow selects new arrivals, removes deleted selections and never reloa
  const next={...photo,id:'00000000-0000-4000-8000-000000000002'};DATA.photos.unshift(next);handlers.household('photos');assert.equal(App.photos.id,next.id);App.photos.mount(container);assert.equal(container.htmlWrites,2);
  DATA.photos=[photo];handlers.household('photos');assert.equal(App.photos.id,id);DATA.photos=[];handlers.household('photos');assert.equal(App.photos.current(),null);
 });
+test('automatic photo rotation waits five minutes, skips inactive views, and preserves immediate next/previous controls',()=>{
+ const handlers={},timers=[],DATA={photos:[photo,{...photo,id:'00000000-0000-4000-8000-000000000002'}]},document={hidden:false};
+ const App={mode:'day',current:'photos',on:(e,fn)=>handlers[e]=fn,emit(){}};
+ vm.runInNewContext(readFileSync(new URL('./js/photos.js',import.meta.url),'utf8'),{App,DATA,Date,document,setInterval:(fn,ms)=>timers.push({fn,ms})});
+ handlers.household('photos');handlers.ready();assert.equal(timers.length,1);assert.equal(timers[0].ms,300000);
+ timers[0].fn();assert.equal(App.photos.id,DATA.photos[1].id);
+ App.photos.paused=true;timers[0].fn();assert.equal(App.photos.id,DATA.photos[1].id);
+ App.photos.step(-1);assert.equal(App.photos.id,photo.id);App.photos.paused=false;
+ document.hidden=true;timers[0].fn();assert.equal(App.photos.id,photo.id);document.hidden=false;
+ App.current='home';timers[0].fn();assert.equal(App.photos.id,photo.id);
+ App.mode='ambient';timers[0].fn();assert.equal(App.photos.id,DATA.photos[1].id);
+});

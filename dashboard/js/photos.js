@@ -14,5 +14,5 @@
   img.onload=function(){if(container.dataset.photo===src){ status.textContent=''; delete container.dataset.failedAt; }};img.onerror=function(){if(container.dataset.photo===src){container.dataset.failedAt=String(Date.now());status.textContent='Photo unavailable. Check Wi-Fi and the token’s photos_read permission, then refresh.';}};img.src=src;
  };
  App.on('household',function(domain){if(domain!=='photos')return;var latest=DATA.photos[0];if(latest&&latest.id!==head){head=latest.id;P.id=latest.id;}else if(!DATA.photos.some(function(p){return p.id===P.id;}))P.id=latest?latest.id:null;App.emit('photo');});
- App.on('ready',function(){setInterval(function(){if(document.hidden||P.paused||DATA.photos.length<2)return;if(App.mode==='ambient'||App.current==='photos'&&App.mode==='day')P.step(1);},20000);});
+ App.on('ready',function(){setInterval(function(){if(document.hidden||P.paused||DATA.photos.length<2)return;if(App.mode==='ambient'||App.current==='photos'&&App.mode==='day')P.step(1);},5*60*1000);});
 })();

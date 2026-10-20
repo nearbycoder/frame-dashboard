@@ -115,6 +115,6 @@
   };
   App.on('ready', function () {
     L.refresh();
-    setInterval(function () { if (!document.hidden) L.refresh(); }, 20000);
+    setInterval(function () { if (!document.hidden) L.refresh(); }, 5 * 60 * 1000);
   });
 })();

@@ -130,7 +130,7 @@
   App.on('ready', function () {
     names.forEach(function (name) { H.refresh(name); });
     var seconds = 0;
-    setInterval(function () { if (document.hidden) return; seconds += 60; ['time', 'chores', 'shopping', 'photos'].forEach(function (name) { H.refresh(name); }); H.refreshTodayChores(); if (seconds % 300 === 0) H.refresh('calendar'); if (seconds % 900 === 0) { H.refresh('weather'); H.refresh('forecast'); } }, 60000);
+    setInterval(function () { if (document.hidden) return; seconds += 300; ['time', 'chores', 'shopping', 'photos', 'calendar'].forEach(function (name) { H.refresh(name); }); H.refreshTodayChores(); if (seconds % 900 === 0) { H.refresh('weather'); H.refresh('forecast'); } }, 5 * 60 * 1000);
     document.addEventListener('visibilitychange', function () { if (!document.hidden) names.forEach(function (name) { H.refresh(name); }); });
     document.addEventListener('click', function (e) { var b = e.target.closest('[data-refresh]'); if (b) H.refresh(b.dataset.refresh); });
   });

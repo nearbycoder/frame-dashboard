@@ -23,8 +23,10 @@ The development server reads authorization from the desktop Secret Service keyri
 
 ## Behavior
 
-- Inventory refreshes every 20 seconds while the dashboard is visible, with
-  server-side coalescing and a five-second cache.
+- Inventory refreshes every five minutes while the dashboard is visible, with
+  server-side coalescing and a five-second cache. Opening Lights or tapping
+  Refresh still reads immediately, and light controls keep their immediate
+  confirmation reads. Changes made elsewhere may take up to five minutes to appear.
 - Home Assistant brightness (0–255) is converted to percent; write requests
   use RingOS's 0–100 schema. Power off and brightness zero are supported.
 - Tap a compact light row to toggle power. Slide horizontally to adjust
@@ -58,4 +60,3 @@ Run `node --test ringos.test.mjs lights-client.test.mjs light-gesture.test.mjs` 
 brightness, request validation, origin/control-key protection, concurrent light
 commands, stale response handling and no-retry checks with fake transports.
 These tests do not change real lights.
-

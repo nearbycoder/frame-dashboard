@@ -4,22 +4,39 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 const tick = () => new Promise(resolve => setImmediate(resolve));
 function client() {
-  const requests = [];
+  const requests = [], handlers = {}, timers = [], document = { hidden: false };
   class XHR {
     open(method, path) { this.method = method; this.path = path; }
     setRequestHeader() {}
     send(body) { this.body = body ? JSON.parse(body) : null; requests.push(this); }
     reply(value, status = 200) { this.status = status; this.responseText = JSON.stringify(value); this.onload(); }
   }
-  const App = { on() {}, emit() {}, toast() {}, esc: String };
-  const context = { App, XMLHttpRequest: XHR, Promise, setInterval() {}, document: { hidden: false } };
+  const App = { on(name, fn) { handlers[name] = fn; }, emit() {}, toast() {}, esc: String };
+  const context = { App, XMLHttpRequest: XHR, Promise, setInterval(fn, ms) { timers.push({ fn, ms }); }, document };
   vm.runInNewContext(readFileSync(new URL('./js/lights.js', import.meta.url), 'utf8'), context);
   const lights = App.lights;
   lights.items = ['a', 'b'].map(id => ({ id: 'light.' + id, name: id, on: true, available: true, level: 100 }));
   lights.key = 'test'; lights.loaded = true;
-  return { lights, requests };
+  return { lights, requests, handlers, timers, document };
 }
 function response(id, level) { return { light: { id: 'light.' + id, name: id, available: true, on: level > 0, level } }; }
+
+test('background light reads run every five minutes, skip hidden pages, and preserve immediate manual refresh', () => {
+  const f = client();
+  let reads = 0;
+  f.lights.refresh = () => { reads++; };
+  f.handlers.ready();
+  assert.equal(reads, 1);
+  assert.equal(f.timers.length, 1);
+  assert.equal(f.timers[0].ms, 300000);
+  f.timers[0].fn();
+  assert.equal(reads, 2);
+  f.document.hidden = true;
+  f.timers[0].fn();
+  assert.equal(reads, 2);
+  f.lights.refresh();
+  assert.equal(reads, 3);
+});
 
 test('two lights send concurrently, repeated same-light gestures coalesce, old polling cannot overwrite them', async () => {
   const { lights, requests } = client();
