@@ -32,7 +32,7 @@ No CORS access or general MCP proxy is provided. Lighting writes require the loo
 
 The cache validates paths, file-count/size limits, SHA-256, the HTML content version and every referenced asset before an atomic directory switch. Existing cached releases are checked again on restart. Older assets remain available until the displayed page accepts a new release. An offline start still displays the cached interface; lighting and update checks need internet.
 
-Android Wi-Fi DNS is passed by the service because static Linux binaries cannot use Android's netd resolver. A launch without Wi-Fi uses 1.1.1.1 as a fallback and still serves cached files. Restart the frame after changing Wi-Fi DNS so the runtime uses the new resolver. TLS certificate and hostname verification stay enabled. The embedded `roots.crt` is the public Mozilla CA store distributed by [curl](https://curl.se/docs/caextract.html), under MPL-2.0, downloaded and SHA-256 verified on 2026-10-11 (`a41b5d356aea97a529fe27e0f7316d2f9d946d75927476cf9cf1b90637d00505`). It contains certificates, not private keys.
+Android Wi-Fi DNS is passed by the service because static Linux binaries cannot use Android's netd resolver. A launch without Wi-Fi uses 1.1.1.1 as a fallback and still serves cached files. Restart the frame after changing Wi-Fi DNS so the runtime uses the new resolver. TLS certificate and hostname verification stay enabled. The embedded `roots.crt` is the public Mozilla CA store distributed by [curl](https://curl.se/docs/caextract.html), under MPL-2.0, downloaded and SHA-256 verified on 2026-10-20 (`796f1389bfea13c0ed78f663b765baaff54a508e5483786bd6ece73c5e3e3cbe`). It contains certificates, not private keys.
 
 ## Build and check
 
