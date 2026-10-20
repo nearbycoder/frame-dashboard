@@ -1,0 +1,54 @@
+name: Refresh embedded CA store
+on:
+  schedule:
+    - cron: '17 6 1 * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download and verify curl CA bundle
+        id: fetch
+        working-directory: dashboard/device-runtime
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/cacert.pem" https://curl.se/ca/cacert.pem
+          curl -fsSL -o "$RUNNER_TEMP/cacert.pem.sha256" https://curl.se/ca/cacert.pem.sha256
+          expected=$(cut -d' ' -f1 "$RUNNER_TEMP/cacert.pem.sha256")
+          actual=$(sha256sum "$RUNNER_TEMP/cacert.pem" | cut -d' ' -f1)
+          test "$expected" = "$actual"
+          if cmp -s "$RUNNER_TEMP/cacert.pem" roots.crt; then
+            echo "roots.crt is current"; exit 0
+          fi
+          cp "$RUNNER_TEMP/cacert.pem" roots.crt
+          today=$(date -u +%F)
+          sed -i -E "s/downloaded and SHA-256 verified on [0-9-]+ \(\`[0-9a-f]{64}\`\)/downloaded and SHA-256 verified on $today (\`$actual\`)/" README.md
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "date=$today" >> "$GITHUB_OUTPUT"
+      - if: steps.fetch.outputs.changed == 'true'
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.x'
+          cache: false
+      - if: steps.fetch.outputs.changed == 'true'
+        run: go test -race ./... && go vet ./...
+        working-directory: dashboard/device-runtime
+      - name: Open pull request
+        if: steps.fetch.outputs.changed == 'true'
+        run: |
+          branch="refresh-roots-$DATE"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git switch -c "$branch"
+          git commit -am "Refresh embedded CA store to curl bundle of $DATE"
+          git push --force origin "$branch"
+          gh pr create --base main --head "$branch" --title "Refresh embedded CA store ($DATE)" \
+            --body "Automated monthly refresh of \`dashboard/device-runtime/roots.crt\` from https://curl.se/ca/cacert.pem, SHA-256 verified against https://curl.se/ca/cacert.pem.sha256. Tests passed in the refresh job. Frames only pick this up after a tagged release and a native runtime reinstall."
+        env:
+          DATE: ${{ steps.fetch.outputs.date }}
+          GH_TOKEN: ${{ github.token }}
