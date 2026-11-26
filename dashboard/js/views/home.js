@@ -2,7 +2,11 @@
 (function () {
  'use strict';
  var H = App.household, D = window.DATA, V = { el: null };
- function clock() { var n = App.now(); return '<div class="h-time num">' + App.fmt.time(n, false) + '<span class="h-ampm">' + App.fmt.ampm(n) + '</span></div><div class="h-date"><b>' + App.fmt.day(n) + '</b> ' + App.fmt.month(n) + ' ' + n.getDate() + '</div><p class="live-note">' + (H.clock ? 'Ring MCP · Central time' : 'Device clock · Central time') + '</p>' + H.statusHTML('time'); }
+ function clock() {
+  var n = App.now();
+  var badge = App.festive !== 'classic' ? '<span class="festive-countdown">' + App.icon(App.festive === 'frost' ? 'snowflake' : 'tree', 16) + App.esc(App.christmasCountdown(n)) + '</span>' : '';
+  return '<div class="h-time num">' + App.fmt.time(n, false) + '<span class="h-ampm">' + App.fmt.ampm(n) + '</span></div><div class="h-date"><span><b>' + App.fmt.day(n) + '</b> ' + App.fmt.month(n) + ' ' + n.getDate() + '</span>' + badge + '</div><p class="live-note">' + (H.clock ? 'Ring MCP · Central time' : 'Device clock · Central time') + '</p>' + H.statusHTML('time');
+ }
  function weather() {
   var w = D.weather;
   if (!w || w.status === 'unavailable') return '<div class="label">Weather</div><h2 class="serif">Forecast unavailable</h2>' + H.statusHTML('weather', false) + (w ? '<p class="live-note">' + App.esc(w.error || 'The weather service has no forecast available.') + '</p>' : '');
@@ -18,5 +22,6 @@
  App.register('home', { show: function (el) { V.el = el; H.refreshTodayChores(); if (!el.firstChild) { el.innerHTML = '<div class="live-home"><div class="h-clock"></div><button class="live-home-weather" data-go="weather" aria-label="Open seven-day forecast for Tulsa, Oklahoma 74134"></button><section class="live-home-agenda"></section><aside class="live-home-overview"><button class="card" data-go="tasks"></button><button class="card" data-go="shopping"></button><button class="card" data-go="control"></button></aside></div>'; el.addEventListener('click', function (e) { var event = e.target.closest('[data-ev]'); if (event) return App.eventSheet(App.findEvent(event.dataset.ev)); var go = e.target.closest('[data-go]'); if (go) App.go(go.dataset.go); }); } paint(); } });
  App.on('household', function (domain) { if (App.current !== 'home') { App.views.home._dirty = true; return; } if (!V.el) return; if (domain === 'time') V.el.querySelector('.h-clock').innerHTML = clock(); if (domain === 'weather') V.el.querySelector('.live-home-weather').innerHTML = weather(); if (domain === 'calendar') V.el.querySelector('.live-home-agenda').innerHTML = agenda(); if (domain === 'chores') V.el.querySelector('[data-go=tasks]').innerHTML = chores(); if (domain === 'shopping') V.el.querySelector('[data-go=shopping]').innerHTML = shopping(); });
  App.on('lights', function () { if (V.el && App.current === 'home') V.el.querySelector('[data-go=control]').innerHTML = lights(); });
+ App.on('festive', function () { if (V.el && App.current === 'home') V.el.querySelector('.h-clock').innerHTML = clock(); else if (App.views.home) App.views.home._dirty = true; });
  App.on('minute', function () { if (V.el && App.current === 'home') paint(); });
 })();

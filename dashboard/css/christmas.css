@@ -1,0 +1,476 @@
+/* Christmas themes for Android WebView 106 (cssTarget chrome61).
+   No CSS nesting, no color-mix(), no oklch(), no dvh, no 4/8-digit hex colors.
+   Product photos, family photos, and live light swatches remain unstyled. */
+
+/* ================================================================
+   Theme 1: Evergreen & Holly (Default)
+   ================================================================ */
+:root[data-festive="evergreen"] {
+  --paper: #F6F1E6;
+  --paper-2: #E8E0CE;
+  --card: #FFFDF8;
+  --ink: #133124;
+  --ink-rgb: 19 49 36;
+  --ink-2: #2D5140;
+  --mute: #617467;
+  --line: #D5C8AE;
+  --ok: #1D7A4E;
+
+  --festive-accent: #B82328;
+  --festive-accent-2: #1A5C3E;
+  --festive-gold: #C48A24;
+  --festive-glow: #F9E2AE;
+  --festive-rail: #123124;
+  --festive-rail-ink: #EAE2D1;
+  --festive-rail-mute: #9EB5A6;
+  --festive-rail-hover: #1B4433;
+  --festive-pill-bg: #F3E5CA;
+  --festive-pill-ink: #8E1B20;
+  --festive-pill-border: #DEC491;
+  --festive-banner-bg: #F3CA6E;
+  --festive-banner-ink: #1C2B22;
+  --festive-garland: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='22' viewBox='0 0 240 22'%3E%3Cpath d='M0 2 Q60 15 120 5 Q180 15 240 2' fill='none' stroke='%231A5C3E' stroke-width='2' stroke-opacity='0.65'/%3E%3Ccircle cx='28' cy='10' r='5.5' fill='%23C8282E' fill-opacity='0.18'/%3E%3Ccircle cx='28' cy='10' r='3.1' fill='%23C8282E'/%3E%3Ccircle cx='76' cy='13' r='5.5' fill='%23E8AB30' fill-opacity='0.22'/%3E%3Ccircle cx='76' cy='13' r='3.1' fill='%23E8AB30'/%3E%3Ccircle cx='120' cy='9' r='5.5' fill='%23207A4E' fill-opacity='0.2'/%3E%3Ccircle cx='120' cy='9' r='3.1' fill='%23207A4E'/%3E%3Ccircle cx='164' cy='13' r='5.5' fill='%23F4C858' fill-opacity='0.24'/%3E%3Ccircle cx='164' cy='13' r='3.1' fill='%23E5A82E'/%3E%3Ccircle cx='212' cy='10' r='5.5' fill='%23C8282E' fill-opacity='0.18'/%3E%3Ccircle cx='212' cy='10' r='3.1' fill='%23C8282E'/%3E%3C/svg%3E");
+  --festive-snow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg stroke='%23B89452' stroke-width='1.1' stroke-opacity='0.18' fill='none' stroke-linecap='round'%3E%3Cpath d='M36 28v12M30 34h12M31.8 29.8l8.4 8.4M40.2 29.8l-8.4 8.4'/%3E%3Cpath d='M168 134v10M163 139h10M164.5 135.5l7 7M171.5 135.5l-7 7'/%3E%3C/g%3E%3Cg fill='%231A5C3E' fill-opacity='0.11'%3E%3Cpath d='M122 44l1.8 4.2 4.2 1.8-4.2 1.8-1.8 4.2-1.8-4.2-4.2-1.8 4.2-1.8z'/%3E%3Cpath d='M64 166l1.5 3.5 3.5 1.5-3.5 1.5-1.5 3.5-1.5-3.5-3.5-1.5 3.5-1.5z'/%3E%3Ccircle cx='192' cy='40' r='2'/%3E%3Ccircle cx='22' cy='116' r='1.8'/%3E%3Ccircle cx='138' cy='194' r='2'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+:root[data-theme="dark"][data-festive="evergreen"] {
+  --paper: #0E1B15;
+  --paper-2: #1B3126;
+  --card: #15271F;
+  --ink: #F6EFE2;
+  --ink-rgb: 246 239 226;
+  --ink-2: #D8CEBC;
+  --mute: #9BB0A1;
+  --line: #2E4D3E;
+  --ok: #4AD098;
+  --c-ink: #0E1B15;
+
+  --festive-accent: #D94348;
+  --festive-accent-2: #3FA675;
+  --festive-gold: #E6B44C;
+  --festive-glow: #5E441A;
+  --festive-rail: #09130E;
+  --festive-rail-ink: #F2EAD9;
+  --festive-rail-mute: #8BA394;
+  --festive-rail-hover: #15281F;
+  --festive-pill-bg: #263E31;
+  --festive-pill-ink: #F5CE72;
+  --festive-pill-border: #4A6A57;
+  --festive-banner-bg: #E6B44C;
+  --festive-banner-ink: #122119;
+  --festive-garland: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='22' viewBox='0 0 240 22'%3E%3Cpath d='M0 2 Q60 15 120 5 Q180 15 240 2' fill='none' stroke='%233FA675' stroke-width='2' stroke-opacity='0.6'/%3E%3Ccircle cx='28' cy='10' r='6.5' fill='%23EF5350' fill-opacity='0.28'/%3E%3Ccircle cx='28' cy='10' r='3.1' fill='%23F26060'/%3E%3Ccircle cx='76' cy='13' r='6.5' fill='%23F5C85B' fill-opacity='0.32'/%3E%3Ccircle cx='76' cy='13' r='3.1' fill='%23FAD475'/%3E%3Ccircle cx='120' cy='9' r='6.5' fill='%2348C78E' fill-opacity='0.26'/%3E%3Ccircle cx='120' cy='9' r='3.1' fill='%2359D69E'/%3E%3Ccircle cx='164' cy='13' r='6.5' fill='%23FFE399' fill-opacity='0.3'/%3E%3Ccircle cx='164' cy='13' r='3.1' fill='%23FFE8AD'/%3E%3Ccircle cx='212' cy='10' r='6.5' fill='%23EF5350' fill-opacity='0.28'/%3E%3Ccircle cx='212' cy='10' r='3.1' fill='%23F26060'/%3E%3C/svg%3E");
+  --festive-snow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg stroke='%23E6B44C' stroke-width='1.1' stroke-opacity='0.16' fill='none' stroke-linecap='round'%3E%3Cpath d='M36 28v12M30 34h12M31.8 29.8l8.4 8.4M40.2 29.8l-8.4 8.4'/%3E%3Cpath d='M168 134v10M163 139h10M164.5 135.5l7 7M171.5 135.5l-7 7'/%3E%3C/g%3E%3Cg fill='%23F6EFE2' fill-opacity='0.14'%3E%3Cpath d='M122 44l1.8 4.2 4.2 1.8-4.2 1.8-1.8 4.2-1.8-4.2-4.2-1.8 4.2-1.8z'/%3E%3Cpath d='M64 166l1.5 3.5 3.5 1.5-3.5 1.5-1.5 3.5-1.5-3.5-3.5-1.5 3.5-1.5z'/%3E%3Ccircle cx='192' cy='40' r='2'/%3E%3Ccircle cx='22' cy='116' r='1.8'/%3E%3Ccircle cx='138' cy='194' r='2'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ================================================================
+   Theme 2: Cozy Hearth (Cranberry, Gingerbread & Fireplace Gold)
+   ================================================================ */
+:root[data-festive="hearth"] {
+  --paper: #F7EFE4;
+  --paper-2: #EBDDC9;
+  --card: #FFFBF4;
+  --ink: #47151B;
+  --ink-rgb: 71 21 27;
+  --ink-2: #6B2D32;
+  --mute: #88645C;
+  --line: #DEC9B1;
+  --ok: #1E744B;
+
+  --festive-accent: #A91E24;
+  --festive-accent-2: #225E3B;
+  --festive-gold: #C67E18;
+  --festive-glow: #FAD99E;
+  --festive-rail: #5B141B;
+  --festive-rail-ink: #FAF0E2;
+  --festive-rail-mute: #D4ACA4;
+  --festive-rail-hover: #731C24;
+  --festive-pill-bg: #F6E2C5;
+  --festive-pill-ink: #8C191F;
+  --festive-pill-border: #E0BA84;
+  --festive-banner-bg: #F2C162;
+  --festive-banner-ink: #381115;
+  --festive-garland: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='22' viewBox='0 0 240 22'%3E%3Cpath d='M0 2 Q60 15 120 5 Q180 15 240 2' fill='none' stroke='%238C4A22' stroke-width='2' stroke-opacity='0.6'/%3E%3Ccircle cx='28' cy='10' r='5.5' fill='%23E39324' fill-opacity='0.24'/%3E%3Ccircle cx='28' cy='10' r='3.1' fill='%23E39324'/%3E%3Ccircle cx='76' cy='13' r='5.5' fill='%23B82026' fill-opacity='0.2'/%3E%3Ccircle cx='76' cy='13' r='3.1' fill='%23B82026'/%3E%3Ccircle cx='120' cy='9' r='5.5' fill='%23F2BA49' fill-opacity='0.25'/%3E%3Ccircle cx='120' cy='9' r='3.1' fill='%23E8A930'/%3E%3Ccircle cx='164' cy='13' r='5.5' fill='%23256B41' fill-opacity='0.22'/%3E%3Ccircle cx='164' cy='13' r='3.1' fill='%23256B41'/%3E%3Ccircle cx='212' cy='10' r='5.5' fill='%23B82026' fill-opacity='0.2'/%3E%3Ccircle cx='212' cy='10' r='3.1' fill='%23B82026'/%3E%3C/svg%3E");
+  --festive-snow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg stroke='%23C67E18' stroke-width='1.1' stroke-opacity='0.18' fill='none' stroke-linecap='round'%3E%3Cpath d='M36 28v12M30 34h12M31.8 29.8l8.4 8.4M40.2 29.8l-8.4 8.4'/%3E%3Cpath d='M168 134v10M163 139h10M164.5 135.5l7 7M171.5 135.5l-7 7'/%3E%3C/g%3E%3Cg fill='%23A91E24' fill-opacity='0.09'%3E%3Cpath d='M122 44l1.8 4.2 4.2 1.8-4.2 1.8-1.8 4.2-1.8-4.2-4.2-1.8 4.2-1.8z'/%3E%3Cpath d='M64 166l1.5 3.5 3.5 1.5-3.5 1.5-1.5 3.5-1.5-3.5-3.5-1.5 3.5-1.5z'/%3E%3Ccircle cx='192' cy='40' r='2'/%3E%3Ccircle cx='22' cy='116' r='1.8'/%3E%3Ccircle cx='138' cy='194' r='2'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+:root[data-theme="dark"][data-festive="hearth"] {
+  --paper: #1B0F10;
+  --paper-2: #331B1E;
+  --card: #261416;
+  --ink: #FAF0E2;
+  --ink-rgb: 250 240 226;
+  --ink-2: #E0C9B5;
+  --mute: #B59287;
+  --line: #542C31;
+  --ok: #4CC788;
+  --c-ink: #1B0F10;
+
+  --festive-accent: #E24848;
+  --festive-accent-2: #48A872;
+  --festive-gold: #F0B94E;
+  --festive-glow: #66421A;
+  --festive-rail: #120809;
+  --festive-rail-ink: #FAF0E2;
+  --festive-rail-mute: #AE887E;
+  --festive-rail-hover: #2B1316;
+  --festive-pill-bg: #3D1F23;
+  --festive-pill-ink: #F7CB6E;
+  --festive-pill-border: #6B3C3E;
+  --festive-banner-bg: #F0B94E;
+  --festive-banner-ink: #240E10;
+  --festive-garland: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='22' viewBox='0 0 240 22'%3E%3Cpath d='M0 2 Q60 15 120 5 Q180 15 240 2' fill='none' stroke='%23C67E18' stroke-width='2' stroke-opacity='0.55'/%3E%3Ccircle cx='28' cy='10' r='6.5' fill='%23FFA93A' fill-opacity='0.34'/%3E%3Ccircle cx='28' cy='10' r='3.1' fill='%23FFBE5C'/%3E%3Ccircle cx='76' cy='13' r='6.5' fill='%23F25757' fill-opacity='0.32'/%3E%3Ccircle cx='76' cy='13' r='3.1' fill='%23FA6B6B'/%3E%3Ccircle cx='120' cy='9' r='6.5' fill='%23FFE08A' fill-opacity='0.34'/%3E%3Ccircle cx='120' cy='9' r='3.1' fill='%23FFE8A3'/%3E%3Ccircle cx='164' cy='13' r='6.5' fill='%2356C987' fill-opacity='0.28'/%3E%3Ccircle cx='164' cy='13' r='3.1' fill='%2369DB9A'/%3E%3Ccircle cx='212' cy='10' r='6.5' fill='%23F25757' fill-opacity='0.32'/%3E%3Ccircle cx='212' cy='10' r='3.1' fill='%23FA6B6B'/%3E%3C/svg%3E");
+  --festive-snow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg stroke='%23F0B94E' stroke-width='1.1' stroke-opacity='0.16' fill='none' stroke-linecap='round'%3E%3Cpath d='M36 28v12M30 34h12M31.8 29.8l8.4 8.4M40.2 29.8l-8.4 8.4'/%3E%3Cpath d='M168 134v10M163 139h10M164.5 135.5l7 7M171.5 135.5l-7 7'/%3E%3C/g%3E%3Cg fill='%23FAF0E2' fill-opacity='0.14'%3E%3Cpath d='M122 44l1.8 4.2 4.2 1.8-4.2 1.8-1.8 4.2-1.8-4.2-4.2-1.8 4.2-1.8z'/%3E%3Cpath d='M64 166l1.5 3.5 3.5 1.5-3.5 1.5-1.5 3.5-1.5-3.5-3.5-1.5 3.5-1.5z'/%3E%3Ccircle cx='192' cy='40' r='2'/%3E%3Ccircle cx='22' cy='116' r='1.8'/%3E%3Ccircle cx='138' cy='194' r='2'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ================================================================
+   Theme 3: Winter Frost (Snowfall, Midnight Pine & Silver Gold)
+   ================================================================ */
+:root[data-festive="frost"] {
+  --paper: #EEF3F8;
+  --paper-2: #DCE7F2;
+  --card: #FAFDFF;
+  --ink: #132A42;
+  --ink-rgb: 19 42 66;
+  --ink-2: #2D4E6E;
+  --mute: #617B94;
+  --line: #C2D4E6;
+  --ok: #197D6A;
+
+  --festive-accent: #BE2A38;
+  --festive-accent-2: #1E639B;
+  --festive-gold: #B98C2E;
+  --festive-glow: #CDE4FA;
+  --festive-rail: #132A42;
+  --festive-rail-ink: #EAF3FC;
+  --festive-rail-mute: #99B4CF;
+  --festive-rail-hover: #1D3B5B;
+  --festive-pill-bg: #E1EDF8;
+  --festive-pill-ink: #174775;
+  --festive-pill-border: #B3CEE8;
+  --festive-banner-bg: #F1CB75;
+  --festive-banner-ink: #13253A;
+  --festive-garland: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='22' viewBox='0 0 240 22'%3E%3Cpath d='M0 2 Q60 15 120 5 Q180 15 240 2' fill='none' stroke='%232D6394' stroke-width='2' stroke-opacity='0.55'/%3E%3Ccircle cx='28' cy='10' r='5.5' fill='%232B78B8' fill-opacity='0.22'/%3E%3Ccircle cx='28' cy='10' r='3.1' fill='%232B78B8'/%3E%3Ccircle cx='76' cy='13' r='5.5' fill='%23C93040' fill-opacity='0.2'/%3E%3Ccircle cx='76' cy='13' r='3.1' fill='%23C93040'/%3E%3Ccircle cx='120' cy='9' r='5.5' fill='%23D6A438' fill-opacity='0.24'/%3E%3Ccircle cx='120' cy='9' r='3.1' fill='%23D6A438'/%3E%3Ccircle cx='164' cy='13' r='5.5' fill='%2356A4DB' fill-opacity='0.24'/%3E%3Ccircle cx='164' cy='13' r='3.1' fill='%233A8BC7'/%3E%3Ccircle cx='212' cy='10' r='5.5' fill='%23C93040' fill-opacity='0.2'/%3E%3Ccircle cx='212' cy='10' r='3.1' fill='%23C93040'/%3E%3C/svg%3E");
+  --festive-snow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg stroke='%232E6EA3' stroke-width='1.1' stroke-opacity='0.18' fill='none' stroke-linecap='round'%3E%3Cpath d='M36 28v12M30 34h12M31.8 29.8l8.4 8.4M40.2 29.8l-8.4 8.4'/%3E%3Cpath d='M168 134v10M163 139h10M164.5 135.5l7 7M171.5 135.5l-7 7'/%3E%3C/g%3E%3Cg fill='%233C79AD' fill-opacity='0.13'%3E%3Cpath d='M122 44l1.8 4.2 4.2 1.8-4.2 1.8-1.8 4.2-1.8-4.2-4.2-1.8 4.2-1.8z'/%3E%3Cpath d='M64 166l1.5 3.5 3.5 1.5-3.5 1.5-1.5 3.5-1.5-3.5-3.5-1.5 3.5-1.5z'/%3E%3Ccircle cx='192' cy='40' r='2'/%3E%3Ccircle cx='22' cy='116' r='1.8'/%3E%3Ccircle cx='138' cy='194' r='2'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+:root[data-theme="dark"][data-festive="frost"] {
+  --paper: #0C1522;
+  --paper-2: #1A2D45;
+  --card: #132236;
+  --ink: #EEF5FC;
+  --ink-rgb: 238 245 252;
+  --ink-2: #C7D9EC;
+  --mute: #8AA5C2;
+  --line: #2C4768;
+  --ok: #4AD0B4;
+  --c-ink: #0C1522;
+
+  --festive-accent: #E65563;
+  --festive-accent-2: #63B0F0;
+  --festive-gold: #F0C766;
+  --festive-glow: #234970;
+  --festive-rail: #08101A;
+  --festive-rail-ink: #EBF4FC;
+  --festive-rail-mute: #829DBB;
+  --festive-rail-hover: #132338;
+  --festive-pill-bg: #1B3350;
+  --festive-pill-ink: #9DD0FA;
+  --festive-pill-border: #3B5F88;
+  --festive-banner-bg: #F0C766;
+  --festive-banner-ink: #0D1A2B;
+  --festive-garland: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='22' viewBox='0 0 240 22'%3E%3Cpath d='M0 2 Q60 15 120 5 Q180 15 240 2' fill='none' stroke='%2363B0F0' stroke-width='2' stroke-opacity='0.55'/%3E%3Ccircle cx='28' cy='10' r='6.5' fill='%236BC2FA' fill-opacity='0.34'/%3E%3Ccircle cx='28' cy='10' r='3.1' fill='%238CD3FF'/%3E%3Ccircle cx='76' cy='13' r='6.5' fill='%23F56573' fill-opacity='0.3'/%3E%3Ccircle cx='76' cy='13' r='3.1' fill='%23FA7A87'/%3E%3Ccircle cx='120' cy='9' r='6.5' fill='%23F7D47A' fill-opacity='0.34'/%3E%3Ccircle cx='120' cy='9' r='3.1' fill='%23FFE094'/%3E%3Ccircle cx='164' cy='13' r='6.5' fill='%23FFFFFF' fill-opacity='0.32'/%3E%3Ccircle cx='164' cy='13' r='3.1' fill='%23FFFFFF'/%3E%3Ccircle cx='212' cy='10' r='6.5' fill='%236BC2FA' fill-opacity='0.34'/%3E%3Ccircle cx='212' cy='10' r='3.1' fill='%238CD3FF'/%3E%3C/svg%3E");
+  --festive-snow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg stroke='%238CC7F0' stroke-width='1.1' stroke-opacity='0.2' fill='none' stroke-linecap='round'%3E%3Cpath d='M36 28v12M30 34h12M31.8 29.8l8.4 8.4M40.2 29.8l-8.4 8.4'/%3E%3Cpath d='M168 134v10M163 139h10M164.5 135.5l7 7M171.5 135.5l-7 7'/%3E%3C/g%3E%3Cg fill='%23FFFFFF' fill-opacity='0.16'%3E%3Cpath d='M122 44l1.8 4.2 4.2 1.8-4.2 1.8-1.8 4.2-1.8-4.2-4.2-1.8 4.2-1.8z'/%3E%3Cpath d='M64 166l1.5 3.5 3.5 1.5-3.5 1.5-1.5 3.5-1.5-3.5-3.5-1.5 3.5-1.5z'/%3E%3Ccircle cx='192' cy='40' r='2'/%3E%3Ccircle cx='22' cy='116' r='1.8'/%3E%3Ccircle cx='138' cy='194' r='2'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ================================================================
+   Shared Festive Layout & Surfaces (active for all Christmas themes)
+   ================================================================ */
+.festive-garland { display: none; }
+.festive-countdown { display: none; }
+.amb-festive { display: none; }
+
+[data-festive]:not([data-festive="classic"]) .views::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background-image: var(--festive-snow);
+  background-repeat: repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+
+[data-festive]:not([data-festive="classic"]) .festive-garland {
+  display: block;
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 22px;
+  background-image: var(--festive-garland);
+  background-repeat: repeat-x;
+  background-position: top center;
+  pointer-events: none;
+  z-index: 35;
+}
+
+[data-festive]:not([data-festive="classic"]) .stage.is-bleed-view .festive-garland,
+[data-festive]:not([data-festive="classic"]) .stage[data-mode="ambient"] .festive-garland,
+[data-festive]:not([data-festive="classic"]) .stage[data-mode="night"] .festive-garland {
+  display: none;
+}
+
+[data-festive]:not([data-festive="classic"]) .view:not(.view--bleed) {
+  padding-top: 28px;
+}
+
+/* Festive navigation rail */
+[data-festive]:not([data-festive="classic"]) .rail {
+  background: var(--festive-rail);
+  border-right: 2px solid var(--festive-gold);
+}
+[data-festive]:not([data-festive="classic"]) .rail-item {
+  color: var(--festive-rail-ink);
+}
+[data-festive]:not([data-festive="classic"]) .rail-item:active {
+  background: var(--festive-rail-hover);
+}
+[data-festive]:not([data-festive="classic"]) .rail-item.is-active {
+  background: var(--festive-accent);
+  color: #FFFDF8;
+  box-shadow: inset 4px 0 0 var(--festive-gold);
+}
+[data-festive]:not([data-festive="classic"]) .rail-item.is-active:active {
+  background: var(--festive-accent);
+}
+[data-festive]:not([data-festive="classic"]) .rail-clock {
+  color: var(--festive-rail-ink);
+  border-top: 1px solid rgba(255, 255, 255, .14);
+}
+[data-festive]:not([data-festive="classic"]) .rail-clock.is-holding {
+  background: var(--festive-rail-hover);
+}
+[data-festive]:not([data-festive="classic"]) .rail-clock span {
+  color: var(--festive-gold);
+}
+[data-festive]:not([data-festive="classic"]) .update-dot {
+  background: var(--festive-gold);
+  box-shadow: 0 0 0 2px var(--festive-rail);
+}
+
+/* Home clock, countdown pill, and weather divider */
+[data-festive]:not([data-festive="classic"]) .h-clock,
+[data-festive]:not([data-festive="classic"]) .live-home-weather {
+  border-bottom: 3px solid var(--festive-accent);
+}
+[data-festive]:not([data-festive="classic"]) .h-ampm {
+  color: var(--festive-accent);
+}
+[data-festive]:not([data-festive="classic"]) .h-date {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+[data-festive]:not([data-festive="classic"]) .h-date b {
+  margin-right: 0;
+}
+[data-festive]:not([data-festive="classic"]) .festive-countdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--festive-pill-bg);
+  color: var(--festive-pill-ink);
+  border: 1px solid var(--festive-pill-border);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 800;
+  font-stretch: 80%;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+[data-festive]:not([data-festive="classic"]) .festive-countdown .i {
+  color: var(--festive-gold);
+}
+
+/* Cards & Home overview accents */
+[data-festive]:not([data-festive="classic"]) .card {
+  border: 1px solid var(--line);
+}
+[data-festive]:not([data-festive="classic"]) .live-home-overview .card:nth-child(1) {
+  border-left: 5px solid var(--festive-accent);
+}
+[data-festive]:not([data-festive="classic"]) .live-home-overview .card:nth-child(2) {
+  border-left: 5px solid var(--festive-accent-2);
+}
+[data-festive]:not([data-festive="classic"]) .live-home-overview .card:nth-child(3) {
+  border-left: 5px solid var(--festive-gold);
+}
+[data-festive]:not([data-festive="classic"]) .live-home-overview .card .label {
+  color: var(--festive-accent-2);
+}
+[data-festive]:not([data-festive="classic"]) .live-home-overview .card:nth-child(1) .label {
+  color: var(--festive-accent);
+}
+
+/* Buttons, chips, segments, calendar week */
+[data-festive]:not([data-festive="classic"]) .btn {
+  border-color: var(--ink);
+}
+[data-festive]:not([data-festive="classic"]) .btn--solid {
+  background: var(--festive-accent);
+  border-color: var(--festive-accent);
+  color: #FFFDF8;
+}
+[data-festive]:not([data-festive="classic"]) .seg button.is-on,
+[data-festive]:not([data-festive="classic"]) .chip.is-on,
+[data-festive]:not([data-festive="classic"]) .live-week button.is-on,
+[data-festive]:not([data-festive="classic"]) .live-shopping-check.is-done,
+[data-festive]:not([data-festive="classic"]) .s-tile.is-on,
+[data-festive]:not([data-festive="classic"]) .display-modes button.is-on,
+[data-festive]:not([data-festive="classic"]) .festive-modes button.is-on {
+  background: var(--festive-accent);
+  color: #FFFDF8;
+}
+
+/* Shopping, Lights, Weather, Chores */
+[data-festive]:not([data-festive="classic"]) .s-cat-h {
+  border-bottom: 2px solid var(--festive-accent);
+}
+[data-festive]:not([data-festive="classic"]) .live-shopping-add {
+  background: var(--card);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--festive-accent);
+}
+[data-festive]:not([data-festive="classic"]) .s-input-wrap {
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+[data-festive]:not([data-festive="classic"]) .usual-open {
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--festive-accent-2);
+}
+[data-festive]:not([data-festive="classic"]) .usual-product.is-added {
+  border-color: var(--festive-accent);
+}
+[data-festive]:not([data-festive="classic"]) .light-bar,
+[data-festive]:not([data-festive="classic"]) .light-color {
+  border: 1px solid var(--line);
+}
+[data-festive]:not([data-festive="classic"]) .light-line-fill {
+  background: var(--festive-glow);
+}
+[data-festive]:not([data-festive="classic"]) .forecast-day {
+  border-color: var(--line);
+}
+[data-festive]:not([data-festive="classic"]) .forecast-day.is-selected {
+  border-color: var(--festive-accent);
+  background: var(--paper-2);
+}
+[data-festive]:not([data-festive="classic"]) .forecast-detail {
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--festive-gold);
+}
+[data-festive]:not([data-festive="classic"]) .live-person-lane {
+  border: 1px solid var(--line);
+}
+
+/* Sheets, banners, toasts */
+[data-festive]:not([data-festive="classic"]) .sheet {
+  border: 2px solid var(--festive-gold);
+}
+[data-festive]:not([data-festive="classic"]) .sheet.sheet--usuals {
+  border: 0;
+}
+[data-festive]:not([data-festive="classic"]) .banner {
+  background: var(--festive-banner-bg);
+  color: var(--festive-banner-ink);
+}
+[data-festive]:not([data-festive="classic"]) .banner-btn--solid {
+  background: var(--festive-accent);
+  color: #FFFDF8;
+}
+[data-festive]:not([data-festive="classic"]) .toast {
+  background: var(--festive-rail);
+  color: #FFFDF8;
+  border: 1px solid var(--festive-gold);
+}
+[data-festive]:not([data-festive="classic"]) .toast--error {
+  background: var(--alert);
+  color: #FFFFFF;
+  border-color: transparent;
+}
+
+/* Ambient festive background & holiday badge */
+[data-festive="evergreen"] .amb-live-background {
+  background: radial-gradient(ellipse at 72% 18%, #1F4A36, #09140F 72%);
+}
+[data-festive="hearth"] .amb-live-background {
+  background: radial-gradient(ellipse at 72% 18%, #591C22, #12080A 72%);
+}
+[data-festive="frost"] .amb-live-background {
+  background: radial-gradient(ellipse at 72% 18%, #1E446B, #08101C 72%);
+}
+[data-festive]:not([data-festive="classic"]) .amb-festive {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: rgba(15, 22, 18, .55);
+  border: 1px solid rgba(242, 200, 107, .55);
+  color: #FAF2DF;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+[data-festive]:not([data-festive="classic"]) .amb-festive .i {
+  color: #F4C862;
+}
+
+/* ================================================================
+   Display Settings: Christmas Theme Picker
+   ================================================================ */
+.sheet--display { width: 640px; }
+.display-section-label { margin: 22px 0 10px; }
+.festive-modes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.festive-modes button {
+  min-height: 78px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: var(--paper-2);
+  border: 2px solid transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 6px;
+  text-align: left;
+}
+.festive-modes button:active { opacity: .82; }
+.festive-modes button.is-on {
+  background: var(--ink);
+  color: var(--paper);
+}
+.festive-mode-top {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.festive-mode-top b { font-size: 21px; font-weight: 800; }
+.festive-modes small { font-size: 14px; opacity: .78; line-height: 1.2; }
+.festive-swatches { display: inline-flex; gap: 5px; flex: none; }
+.festive-swatches i {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, .55);
+}

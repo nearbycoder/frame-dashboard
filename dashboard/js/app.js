@@ -5,6 +5,15 @@
   var App = window.App = { state: D, views: {}, current: null, mode: 'day' };
   App.lite = !!window.HQ_LITE;
   App.theme = window.HQ_THEME === 'dark' ? 'dark' : 'light';
+  var FESTIVE_THEMES = ['evergreen', 'hearth', 'frost', 'classic'];
+  var THEME_COLORS = {
+    evergreen: { light: '#F6F1E6', dark: '#0E1B15' },
+    hearth: { light: '#F7EFE4', dark: '#1B0F10' },
+    frost: { light: '#EEF3F8', dark: '#0C1522' },
+    classic: { light: '#F2EEE6', dark: '#17191D' }
+  };
+  App.festive = FESTIVE_THEMES.indexOf(window.HQ_FESTIVE) >= 0 ? window.HQ_FESTIVE : 'evergreen';
+  function themeColor() { return (THEME_COLORS[App.festive] || THEME_COLORS.classic)[App.theme]; }
   var $ = App.$ = function (s, r) { return (r || document).querySelector(s); };
   App.$$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
 
@@ -127,6 +136,8 @@
     if (App.current && App.current !== name && App.views[App.current].hide) App.views[App.current].hide();
     App.$$('.view').forEach(function (v) { v.classList.toggle('is-active', v.dataset.view === name); });
     App.$$('.rail-item').forEach(function (b) { b.classList.toggle('is-active', b.dataset.go === name); });
+    var stageEl = $('#stage');
+    if (stageEl && stageEl.classList) stageEl.classList.toggle('is-bleed-view', name === 'photos');
     App.current = name;
     var view = App.views[name];
     if (!view._built || view._dirty || opts.rerender || (view.minutely && view._min !== minuteKey())) build(name, opts);
@@ -241,7 +252,7 @@
     if (m === 'day' || m === 'dark') {
       App.theme = m === 'dark' ? 'dark' : 'light';
       document.documentElement.dataset.theme = App.theme;
-      $('meta[name="theme-color"]').content = App.theme === 'dark' ? '#17191D' : '#F2EEE6';
+      $('meta[name="theme-color"]').content = themeColor();
       try { localStorage.setItem('homehq.theme', App.theme); } catch (_) {}
       m = 'day';
     }
@@ -249,6 +260,25 @@
     App.mode = m;
     stage.dataset.mode = m;
     App.emit('mode', m);
+  };
+  App.setFestive = function (f) {
+    if (FESTIVE_THEMES.indexOf(f) < 0) return;
+    App.festive = f;
+    document.documentElement.dataset.festive = f;
+    $('meta[name="theme-color"]').content = themeColor();
+    try { localStorage.setItem('homehq.festive', f); } catch (_) {}
+    App.emit('festive', f);
+  };
+  App.christmasCountdown = function (date) {
+    var d = date || App.now();
+    var m = d.getMonth(), day = d.getDate();
+    if (m === 11 && day === 25) return 'Merry Christmas!';
+    if (m === 11 && day === 24) return 'Christmas Eve';
+    if (m === 11 && day > 25) return 'Happy Holidays!';
+    var todayUtc = Date.UTC(d.getFullYear(), m, day);
+    var xmasUtc = Date.UTC(d.getFullYear(), 11, 25);
+    var days = Math.round((xmasUtc - todayUtc) / 86400000);
+    return days === 1 ? '1 day to Christmas' : days + ' days to Christmas';
   };
   App.resumeDashboard = function () { App.setMode(App.theme === 'dark' ? 'dark' : 'day'); };
 
