@@ -14,7 +14,7 @@ Tap **Settings**, directly above **Updates**, to choose a Wi-Fi network. The And
 
 ## Develop on a computer
 
-Tap **Display** in the sidebar to open display settings. **Light** and **Dark** change the interactive dashboard brightness, and **Christmas theme** switches between **Evergreen**, **Hearth**, **Winter Frost**, and **Classic**; both choices are remembered across page reloads and updates. **Ambient** and **Night** remain available without changing the saved theme.
+Tap **Display** in the sidebar to open display settings. **Light** and **Dark** change the interactive dashboard brightness, and **Thanksgiving theme** switches between **Harvest Gold**, **Cranberry Cider**, **Autumn Sage**, and **Classic**; both choices are remembered across page reloads and updates. **Ambient** and **Night** remain available without changing the saved theme.
 
 Requires Node.js 24 and npm. From `dashboard/`:
 

@@ -5,14 +5,14 @@
   var App = window.App = { state: D, views: {}, current: null, mode: 'day' };
   App.lite = !!window.HQ_LITE;
   App.theme = window.HQ_THEME === 'dark' ? 'dark' : 'light';
-  var FESTIVE_THEMES = ['evergreen', 'hearth', 'frost', 'classic'];
+  var FESTIVE_THEMES = ['harvest', 'cranberry', 'autumn', 'classic'];
   var THEME_COLORS = {
-    evergreen: { light: '#F6F1E6', dark: '#0E1B15' },
-    hearth: { light: '#F7EFE4', dark: '#1B0F10' },
-    frost: { light: '#EEF3F8', dark: '#0C1522' },
+    harvest: { light: '#F7F1E5', dark: '#1A110B' },
+    cranberry: { light: '#F8F0E7', dark: '#1A0E10' },
+    autumn: { light: '#F3F1E8', dark: '#111812' },
     classic: { light: '#F2EEE6', dark: '#17191D' }
   };
-  App.festive = FESTIVE_THEMES.indexOf(window.HQ_FESTIVE) >= 0 ? window.HQ_FESTIVE : 'evergreen';
+  App.festive = FESTIVE_THEMES.indexOf(window.HQ_FESTIVE) >= 0 ? window.HQ_FESTIVE : 'harvest';
   function themeColor() { return (THEME_COLORS[App.festive] || THEME_COLORS.classic)[App.theme]; }
   var $ = App.$ = function (s, r) { return (r || document).querySelector(s); };
   App.$$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
@@ -269,16 +269,25 @@
     try { localStorage.setItem('homehq.festive', f); } catch (_) {}
     App.emit('festive', f);
   };
-  App.christmasCountdown = function (date) {
+  function thanksgivingDay(year) {
+    // US Thanksgiving: 4th Thursday of November.
+    var nov1 = new Date(Date.UTC(year, 10, 1)).getUTCDay();
+    return 1 + ((4 - nov1 + 7) % 7) + 21;
+  }
+  App.thanksgivingLabel = function (date) {
     var d = date || App.now();
-    var m = d.getMonth(), day = d.getDate();
-    if (m === 11 && day === 25) return 'Merry Christmas!';
-    if (m === 11 && day === 24) return 'Christmas Eve';
-    if (m === 11 && day > 25) return 'Happy Holidays!';
-    var todayUtc = Date.UTC(d.getFullYear(), m, day);
-    var xmasUtc = Date.UTC(d.getFullYear(), 11, 25);
-    var days = Math.round((xmasUtc - todayUtc) / 86400000);
-    return days === 1 ? '1 day to Christmas' : days + ' days to Christmas';
+    var y = d.getFullYear(), m = d.getMonth(), day = d.getDate();
+    var todayUtc = Date.UTC(y, m, day);
+    var tgUtc = Date.UTC(y, 10, thanksgivingDay(y));
+    var diff = Math.round((tgUtc - todayUtc) / 86400000);
+    if (diff === 0) return 'Happy Thanksgiving!';
+    if (diff === 1) return 'Thanksgiving Eve';
+    if (diff < 0 && diff >= -3) return 'Thankful Weekend';
+    if (diff < 0) {
+      var nextUtc = Date.UTC(y + 1, 10, thanksgivingDay(y + 1));
+      diff = Math.round((nextUtc - todayUtc) / 86400000);
+    }
+    return diff === 1 ? '1 day to Thanksgiving' : diff + ' days to Thanksgiving';
   };
   App.resumeDashboard = function () { App.setMode(App.theme === 'dark' ? 'dark' : 'day'); };
 

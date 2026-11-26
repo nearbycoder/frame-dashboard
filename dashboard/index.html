@@ -3,27 +3,27 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=1280, initial-scale=1, user-scalable=no">
-  <meta name="theme-color" content="#F6F1E6">
+  <meta name="theme-color" content="#F7F1E5">
   <title>Home HQ</title>
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/icon-192.png">
   <script>
     // Restore before styles load to avoid a bright flash on updates.
     window.HQ_THEME = 'light';
-    window.HQ_FESTIVE = 'evergreen';
+    window.HQ_FESTIVE = 'harvest';
     try {
       if (localStorage.getItem('homehq.theme') === 'dark') window.HQ_THEME = 'dark';
       var savedFestive = localStorage.getItem('homehq.festive');
-      if (savedFestive === 'evergreen' || savedFestive === 'hearth' || savedFestive === 'frost' || savedFestive === 'classic') {
+      if (savedFestive === 'harvest' || savedFestive === 'cranberry' || savedFestive === 'autumn' || savedFestive === 'classic') {
         window.HQ_FESTIVE = savedFestive;
       }
     } catch (_) {}
     document.documentElement.dataset.theme = window.HQ_THEME;
     document.documentElement.dataset.festive = window.HQ_FESTIVE;
     var themeColors = {
-      evergreen: { light: '#F6F1E6', dark: '#0E1B15' },
-      hearth: { light: '#F7EFE4', dark: '#1B0F10' },
-      frost: { light: '#EEF3F8', dark: '#0C1522' },
+      harvest: { light: '#F7F1E5', dark: '#1A110B' },
+      cranberry: { light: '#F8F0E7', dark: '#1A0E10' },
+      autumn: { light: '#F3F1E8', dark: '#111812' },
       classic: { light: '#F2EEE6', dark: '#17191D' }
     };
     document.querySelector('meta[name="theme-color"]').content = themeColors[window.HQ_FESTIVE][window.HQ_THEME];
@@ -49,7 +49,7 @@
   <link rel="stylesheet" href="css/household.css">
   <link rel="stylesheet" href="css/views/weather.css">
   <link rel="stylesheet" href="css/views/photos.css">
-  <link rel="stylesheet" href="css/christmas.css">
+  <link rel="stylesheet" href="css/thanksgiving.css">
 </head>
 <body>
   <div class="stage" id="stage" data-mode="day">

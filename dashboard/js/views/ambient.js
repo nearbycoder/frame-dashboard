@@ -5,7 +5,7 @@
  function paint() {
   var n = App.now(), w = App.weatherNow(), e = App.nextEvent();
   if (App.mode === 'ambient') App.photos.mount($('#ambient .amb-photo'));
-  var festiveBadge = App.festive !== 'classic' ? '<div class="amb-festive">' + App.icon(App.festive === 'frost' ? 'snowflake' : 'tree', 18) + App.esc(App.christmasCountdown(n)) + '</div>' : '';
+  var festiveBadge = App.festive !== 'classic' ? '<div class="amb-festive">' + App.icon('leaf', 18) + App.esc(App.thanksgivingLabel(n)) + '</div>' : '';
   if (App.mode === 'ambient') $('#ambient .amb-info').innerHTML = '<div class="amb-clock"><div class="amb-time num">' + App.fmt.time(n, false) + '</div><div class="amb-date">' + App.fmt.day(n) + ', ' + App.fmt.month(n) + ' ' + n.getDate() + '</div></div><div class="amb-right">' + festiveBadge + '<div class="amb-wx">' + App.icon(w.cond, 38) + '<span class="num">' + w.temp + '°F</span><small>' + App.esc(w.label) + '</small></div>' + (e ? '<div class="amb-next">' + App.esc(e.title) + ' · ' + App.fmt.time(e.start) + '</div>' : '') + '<small>' + App.esc(H.status('calendar') || H.status('weather') || '') + '</small></div>';
   if (App.mode === 'night') $('#night .nt-inner').innerHTML = '<div class="nt-time num">' + App.fmt.time(n, false) + '</div><div class="nt-line">' + App.fmt.day(n) + ' · Central time' + (e ? ' · Next: ' + App.esc(e.title) + ' ' + App.fmt.time(e.start) : '') + '</div>';
  }

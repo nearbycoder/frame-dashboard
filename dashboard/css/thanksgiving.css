@@ -1,0 +1,476 @@
+/* Thanksgiving themes for Android WebView 106 (cssTarget chrome61).
+   No CSS nesting, no color-mix(), no oklch(), no dvh, no 4/8-digit hex colors.
+   Product photos, family photos, and live light swatches remain unstyled. */
+
+/* ================================================================
+   Theme 1: Harvest Gold (Default)
+   ================================================================ */
+:root[data-festive="harvest"] {
+  --paper: #F7F1E5;
+  --paper-2: #ECE1CD;
+  --card: #FFFDF8;
+  --ink: #3B2313;
+  --ink-rgb: 59 35 19;
+  --ink-2: #613E24;
+  --mute: #856B54;
+  --line: #DFCEB4;
+  --ok: #4C7A34;
+
+  --festive-accent: #C2531A;
+  --festive-accent-2: #556B2F;
+  --festive-gold: #D19122;
+  --festive-glow: #FBE0A8;
+  --festive-rail: #3B2010;
+  --festive-rail-ink: #F7ECDC;
+  --festive-rail-mute: #C8AD93;
+  --festive-rail-hover: #522E18;
+  --festive-pill-bg: #F5E2C2;
+  --festive-pill-ink: #9A3B0E;
+  --festive-pill-border: #E0BC84;
+  --festive-banner-bg: #F1BE5A;
+  --festive-banner-ink: #2E190C;
+  --festive-garland: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='22' viewBox='0 0 240 22'%3E%3Cpath d='M0 2 Q60 15 120 5 Q180 15 240 2' fill='none' stroke='%238C5528' stroke-width='2' stroke-opacity='0.58'/%3E%3Cellipse cx='28' cy='10' rx='5.2' ry='2.8' transform='rotate(-22 28 10)' fill='%23C8561B' fill-opacity='0.88'/%3E%3Cellipse cx='76' cy='13' rx='5.2' ry='2.8' transform='rotate(18 76 13)' fill='%23DC9B26' fill-opacity='0.92'/%3E%3Ccircle cx='120' cy='8.5' r='3.1' fill='%23A62A2A'/%3E%3Ccircle cx='125' cy='10.5' r='2.1' fill='%23C8561B'/%3E%3Cellipse cx='164' cy='13' rx='5.2' ry='2.8' transform='rotate(-16 164 13)' fill='%235D7635' fill-opacity='0.88'/%3E%3Cellipse cx='212' cy='10' rx='5.2' ry='2.8' transform='rotate(24 212 10)' fill='%23C8561B' fill-opacity='0.88'/%3E%3C/svg%3E");
+  --festive-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg fill='none' stroke='%23C2531A' stroke-width='1.2' stroke-opacity='0.14' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M36 42c0-9 6-14 12-16 0 7-3 14-12 16zm0 0l-3 5M39 39l6-6'/%3E%3Cpath d='M166 150c-8-2-12-8-13-15 7 1 13 6 13 15zm0 0l4 4'/%3E%3C/g%3E%3Cg fill='%23D19122' fill-opacity='0.14'%3E%3Cellipse cx='122' cy='48' rx='4.5' ry='2.2' transform='rotate(-30 122 48)'/%3E%3Cellipse cx='62' cy='168' rx='4' ry='2' transform='rotate(28 62 168)'/%3E%3Ccircle cx='192' cy='42' r='2.2'/%3E%3Ccircle cx='24' cy='118' r='2'/%3E%3Ccircle cx='138' cy='194' r='2.2'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+:root[data-theme="dark"][data-festive="harvest"] {
+  --paper: #1A110B;
+  --paper-2: #302015;
+  --card: #241810;
+  --ink: #F8EFE1;
+  --ink-rgb: 248 239 225;
+  --ink-2: #DFCDB7;
+  --mute: #AD937B;
+  --line: #4C3422;
+  --ok: #77B359;
+  --c-ink: #1A110B;
+
+  --festive-accent: #E06A2B;
+  --festive-accent-2: #8DA855;
+  --festive-gold: #F0B84D;
+  --festive-glow: #664219;
+  --festive-rail: #110B07;
+  --festive-rail-ink: #F8EFE1;
+  --festive-rail-mute: #A88D75;
+  --festive-rail-hover: #261810;
+  --festive-pill-bg: #3A2516;
+  --festive-pill-ink: #F5C76B;
+  --festive-pill-border: #694629;
+  --festive-banner-bg: #F0B84D;
+  --festive-banner-ink: #1F120A;
+  --festive-garland: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='22' viewBox='0 0 240 22'%3E%3Cpath d='M0 2 Q60 15 120 5 Q180 15 240 2' fill='none' stroke='%23C98D3E' stroke-width='2' stroke-opacity='0.52'/%3E%3Cellipse cx='28' cy='10' rx='5.2' ry='2.8' transform='rotate(-22 28 10)' fill='%23EB7A38' fill-opacity='0.92'/%3E%3Cellipse cx='76' cy='13' rx='5.2' ry='2.8' transform='rotate(18 76 13)' fill='%23F5C359' fill-opacity='0.95'/%3E%3Ccircle cx='120' cy='8.5' r='3.2' fill='%23E05252'/%3E%3Ccircle cx='125' cy='10.5' r='2.1' fill='%23F09A3E'/%3E%3Cellipse cx='164' cy='13' rx='5.2' ry='2.8' transform='rotate(-16 164 13)' fill='%238DB35B' fill-opacity='0.9'/%3E%3Cellipse cx='212' cy='10' rx='5.2' ry='2.8' transform='rotate(24 212 10)' fill='%23EB7A38' fill-opacity='0.92'/%3E%3C/svg%3E");
+  --festive-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg fill='none' stroke='%23F0B84D' stroke-width='1.2' stroke-opacity='0.14' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M36 42c0-9 6-14 12-16 0 7-3 14-12 16zm0 0l-3 5M39 39l6-6'/%3E%3Cpath d='M166 150c-8-2-12-8-13-15 7 1 13 6 13 15zm0 0l4 4'/%3E%3C/g%3E%3Cg fill='%23E06A2B' fill-opacity='0.15'%3E%3Cellipse cx='122' cy='48' rx='4.5' ry='2.2' transform='rotate(-30 122 48)'/%3E%3Cellipse cx='62' cy='168' rx='4' ry='2' transform='rotate(28 62 168)'/%3E%3Ccircle cx='192' cy='42' r='2.2'/%3E%3Ccircle cx='24' cy='118' r='2'/%3E%3Ccircle cx='138' cy='194' r='2.2'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ================================================================
+   Theme 2: Cranberry Cider (Mulled Cranberry, Cinnamon & Amber)
+   ================================================================ */
+:root[data-festive="cranberry"] {
+  --paper: #F8F0E7;
+  --paper-2: #EDDDCB;
+  --card: #FFFBF5;
+  --ink: #4A191D;
+  --ink-rgb: 74 25 29;
+  --ink-2: #6E3035;
+  --mute: #8C6862;
+  --line: #E0CBB8;
+  --ok: #47783D;
+
+  --festive-accent: #9E2430;
+  --festive-accent-2: #B8651B;
+  --festive-gold: #C98824;
+  --festive-glow: #F9D9A4;
+  --festive-rail: #54171D;
+  --festive-rail-ink: #FAF0E4;
+  --festive-rail-mute: #D4B0AA;
+  --festive-rail-hover: #6B2027;
+  --festive-pill-bg: #F6E2CE;
+  --festive-pill-ink: #8C1D28;
+  --festive-pill-border: #DFBA98;
+  --festive-banner-bg: #F2C063;
+  --festive-banner-ink: #381216;
+  --festive-garland: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='22' viewBox='0 0 240 22'%3E%3Cpath d='M0 2 Q60 15 120 5 Q180 15 240 2' fill='none' stroke='%23854728' stroke-width='2' stroke-opacity='0.58'/%3E%3Ccircle cx='28' cy='10' r='3.3' fill='%23A62431'/%3E%3Ccircle cx='33.5' cy='11.5' r='2.2' fill='%23C94747'/%3E%3Cellipse cx='76' cy='13' rx='5.2' ry='2.8' transform='rotate(18 76 13)' fill='%23D68826' fill-opacity='0.92'/%3E%3Cellipse cx='120' cy='9' rx='5.2' ry='2.8' transform='rotate(-12 120 9)' fill='%23A62431' fill-opacity='0.9'/%3E%3Cellipse cx='164' cy='13' rx='5.2' ry='2.8' transform='rotate(-18 164 13)' fill='%235B7844' fill-opacity='0.88'/%3E%3Ccircle cx='212' cy='10' r='3.3' fill='%23A62431'/%3E%3Ccircle cx='206.5' cy='11.5' r='2.2' fill='%23E39A32'/%3E%3C/svg%3E");
+  --festive-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg fill='none' stroke='%239E2430' stroke-width='1.2' stroke-opacity='0.12' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M36 42c0-9 6-14 12-16 0 7-3 14-12 16zm0 0l-3 5M39 39l6-6'/%3E%3Cpath d='M166 150c-8-2-12-8-13-15 7 1 13 6 13 15zm0 0l4 4'/%3E%3C/g%3E%3Cg fill='%23C98824' fill-opacity='0.14'%3E%3Ccircle cx='122' cy='48' r='2.8'/%3E%3Ccircle cx='127' cy='51' r='2'/%3E%3Cellipse cx='62' cy='168' rx='4' ry='2' transform='rotate(28 62 168)'/%3E%3Ccircle cx='192' cy='42' r='2.2'/%3E%3Ccircle cx='24' cy='118' r='2'/%3E%3Ccircle cx='138' cy='194' r='2.2'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+:root[data-theme="dark"][data-festive="cranberry"] {
+  --paper: #1A0E10;
+  --paper-2: #331B1F;
+  --card: #261417;
+  --ink: #FAF0E4;
+  --ink-rgb: 250 240 228;
+  --ink-2: #E2CBB9;
+  --mute: #B59289;
+  --line: #542D33;
+  --ok: #6FB564;
+  --c-ink: #1A0E10;
+
+  --festive-accent: #DB4E58;
+  --festive-accent-2: #E58C3A;
+  --festive-gold: #F0BC56;
+  --festive-glow: #663E1B;
+  --festive-rail: #12080A;
+  --festive-rail-ink: #FAF0E4;
+  --festive-rail-mute: #AE8882;
+  --festive-rail-hover: #2B1317;
+  --festive-pill-bg: #3D1F24;
+  --festive-pill-ink: #F6CB72;
+  --festive-pill-border: #6D3B42;
+  --festive-banner-bg: #F0BC56;
+  --festive-banner-ink: #240E11;
+  --festive-garland: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='22' viewBox='0 0 240 22'%3E%3Cpath d='M0 2 Q60 15 120 5 Q180 15 240 2' fill='none' stroke='%23C98824' stroke-width='2' stroke-opacity='0.52'/%3E%3Ccircle cx='28' cy='10' r='3.3' fill='%23EC5C66'/%3E%3Ccircle cx='33.5' cy='11.5' r='2.2' fill='%23F59B42'/%3E%3Cellipse cx='76' cy='13' rx='5.2' ry='2.8' transform='rotate(18 76 13)' fill='%23F5C359' fill-opacity='0.94'/%3E%3Cellipse cx='120' cy='9' rx='5.2' ry='2.8' transform='rotate(-12 120 9)' fill='%23EC5C66' fill-opacity='0.92'/%3E%3Cellipse cx='164' cy='13' rx='5.2' ry='2.8' transform='rotate(-18 164 13)' fill='%2378B86A' fill-opacity='0.88'/%3E%3Ccircle cx='212' cy='10' r='3.3' fill='%23EC5C66'/%3E%3Ccircle cx='206.5' cy='11.5' r='2.2' fill='%23F5C359'/%3E%3C/svg%3E");
+  --festive-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg fill='none' stroke='%23F0BC56' stroke-width='1.2' stroke-opacity='0.14' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M36 42c0-9 6-14 12-16 0 7-3 14-12 16zm0 0l-3 5M39 39l6-6'/%3E%3Cpath d='M166 150c-8-2-12-8-13-15 7 1 13 6 13 15zm0 0l4 4'/%3E%3C/g%3E%3Cg fill='%23DB4E58' fill-opacity='0.16'%3E%3Ccircle cx='122' cy='48' r='2.8'/%3E%3Ccircle cx='127' cy='51' r='2'/%3E%3Cellipse cx='62' cy='168' rx='4' ry='2' transform='rotate(28 62 168)'/%3E%3Ccircle cx='192' cy='42' r='2.2'/%3E%3Ccircle cx='24' cy='118' r='2'/%3E%3Ccircle cx='138' cy='194' r='2.2'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ================================================================
+   Theme 3: Autumn Sage (Eucalyptus, Acorn & Golden Maple)
+   ================================================================ */
+:root[data-festive="autumn"] {
+  --paper: #F3F1E8;
+  --paper-2: #E4E1D2;
+  --card: #FCFBF7;
+  --ink: #223022;
+  --ink-rgb: 34 48 34;
+  --ink-2: #3D523C;
+  --mute: #6E7B6A;
+  --line: #CFD0BC;
+  --ok: #3B7D4A;
+
+  --festive-accent: #B8521E;
+  --festive-accent-2: #4B6E47;
+  --festive-gold: #C49328;
+  --festive-glow: #F5E0AC;
+  --festive-rail: #263626;
+  --festive-rail-ink: #F2EFE6;
+  --festive-rail-mute: #A4B5A0;
+  --festive-rail-hover: #354A35;
+  --festive-pill-bg: #E6E7D4;
+  --festive-pill-ink: #2E4D2D;
+  --festive-pill-border: #C3C8A8;
+  --festive-banner-bg: #EFC668;
+  --festive-banner-ink: #1E2B1E;
+  --festive-garland: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='22' viewBox='0 0 240 22'%3E%3Cpath d='M0 2 Q60 15 120 5 Q180 15 240 2' fill='none' stroke='%234B6E47' stroke-width='2' stroke-opacity='0.6'/%3E%3Cellipse cx='28' cy='10' rx='5.2' ry='2.8' transform='rotate(-20 28 10)' fill='%23567D51' fill-opacity='0.9'/%3E%3Cellipse cx='76' cy='13' rx='5.2' ry='2.8' transform='rotate(16 76 13)' fill='%23C25A22' fill-opacity='0.9'/%3E%3Cellipse cx='120' cy='9' rx='5.2' ry='2.8' transform='rotate(-14 120 9)' fill='%23D4A030' fill-opacity='0.92'/%3E%3Cellipse cx='164' cy='13' rx='5.2' ry='2.8' transform='rotate(20 164 13)' fill='%23567D51' fill-opacity='0.9'/%3E%3Cellipse cx='212' cy='10' rx='5.2' ry='2.8' transform='rotate(-22 212 10)' fill='%23C25A22' fill-opacity='0.9'/%3E%3C/svg%3E");
+  --festive-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg fill='none' stroke='%234B6E47' stroke-width='1.2' stroke-opacity='0.14' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M36 42c0-9 6-14 12-16 0 7-3 14-12 16zm0 0l-3 5M39 39l6-6'/%3E%3Cpath d='M166 150c-8-2-12-8-13-15 7 1 13 6 13 15zm0 0l4 4'/%3E%3C/g%3E%3Cg fill='%23C49328' fill-opacity='0.14'%3E%3Cellipse cx='122' cy='48' rx='4.5' ry='2.2' transform='rotate(-30 122 48)'/%3E%3Cellipse cx='62' cy='168' rx='4' ry='2' transform='rotate(28 62 168)'/%3E%3Ccircle cx='192' cy='42' r='2.2'/%3E%3Ccircle cx='24' cy='118' r='2'/%3E%3Ccircle cx='138' cy='194' r='2.2'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+:root[data-theme="dark"][data-festive="autumn"] {
+  --paper: #111812;
+  --paper-2: #222F23;
+  --card: #1A241B;
+  --ink: #F3F0E6;
+  --ink-rgb: 243 240 230;
+  --ink-2: #D4D2C4;
+  --mute: #9BA596;
+  --line: #384A39;
+  --ok: #6AC47E;
+  --c-ink: #111812;
+
+  --festive-accent: #DF7136;
+  --festive-accent-2: #7AA874;
+  --festive-gold: #E5B952;
+  --festive-glow: #5C461E;
+  --festive-rail: #0B100C;
+  --festive-rail-ink: #F3F0E6;
+  --festive-rail-mute: #8FA08B;
+  --festive-rail-hover: #1A261B;
+  --festive-pill-bg: #253626;
+  --festive-pill-ink: #D5E8C8;
+  --festive-pill-border: #486349;
+  --festive-banner-bg: #E5B952;
+  --festive-banner-ink: #141D15;
+  --festive-garland: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='22' viewBox='0 0 240 22'%3E%3Cpath d='M0 2 Q60 15 120 5 Q180 15 240 2' fill='none' stroke='%237AA874' stroke-width='2' stroke-opacity='0.52'/%3E%3Cellipse cx='28' cy='10' rx='5.2' ry='2.8' transform='rotate(-20 28 10)' fill='%237FB578' fill-opacity='0.9'/%3E%3Cellipse cx='76' cy='13' rx='5.2' ry='2.8' transform='rotate(16 76 13)' fill='%23EB7D42' fill-opacity='0.92'/%3E%3Cellipse cx='120' cy='9' rx='5.2' ry='2.8' transform='rotate(-14 120 9)' fill='%23F0C65E' fill-opacity='0.94'/%3E%3Cellipse cx='164' cy='13' rx='5.2' ry='2.8' transform='rotate(20 164 13)' fill='%237FB578' fill-opacity='0.9'/%3E%3Cellipse cx='212' cy='10' rx='5.2' ry='2.8' transform='rotate(-22 212 10)' fill='%23EB7D42' fill-opacity='0.92'/%3E%3C/svg%3E");
+  --festive-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cg fill='none' stroke='%237AA874' stroke-width='1.2' stroke-opacity='0.16' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M36 42c0-9 6-14 12-16 0 7-3 14-12 16zm0 0l-3 5M39 39l6-6'/%3E%3Cpath d='M166 150c-8-2-12-8-13-15 7 1 13 6 13 15zm0 0l4 4'/%3E%3C/g%3E%3Cg fill='%23E5B952' fill-opacity='0.14'%3E%3Cellipse cx='122' cy='48' rx='4.5' ry='2.2' transform='rotate(-30 122 48)'/%3E%3Cellipse cx='62' cy='168' rx='4' ry='2' transform='rotate(28 62 168)'/%3E%3Ccircle cx='192' cy='42' r='2.2'/%3E%3Ccircle cx='24' cy='118' r='2'/%3E%3Ccircle cx='138' cy='194' r='2.2'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ================================================================
+   Shared Festive Layout & Surfaces (active for all Thanksgiving themes)
+   ================================================================ */
+.festive-garland { display: none; }
+.festive-countdown { display: none; }
+.amb-festive { display: none; }
+
+[data-festive]:not([data-festive="classic"]) .views::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background-image: var(--festive-pattern);
+  background-repeat: repeat;
+  pointer-events: none;
+  z-index: 0;
+}
+
+[data-festive]:not([data-festive="classic"]) .festive-garland {
+  display: block;
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 22px;
+  background-image: var(--festive-garland);
+  background-repeat: repeat-x;
+  background-position: top center;
+  pointer-events: none;
+  z-index: 35;
+}
+
+[data-festive]:not([data-festive="classic"]) .stage.is-bleed-view .festive-garland,
+[data-festive]:not([data-festive="classic"]) .stage[data-mode="ambient"] .festive-garland,
+[data-festive]:not([data-festive="classic"]) .stage[data-mode="night"] .festive-garland {
+  display: none;
+}
+
+[data-festive]:not([data-festive="classic"]) .view:not(.view--bleed) {
+  padding-top: 28px;
+}
+
+/* Festive navigation rail */
+[data-festive]:not([data-festive="classic"]) .rail {
+  background: var(--festive-rail);
+  border-right: 2px solid var(--festive-gold);
+}
+[data-festive]:not([data-festive="classic"]) .rail-item {
+  color: var(--festive-rail-ink);
+}
+[data-festive]:not([data-festive="classic"]) .rail-item:active {
+  background: var(--festive-rail-hover);
+}
+[data-festive]:not([data-festive="classic"]) .rail-item.is-active {
+  background: var(--festive-accent);
+  color: #FFFDF8;
+  box-shadow: inset 4px 0 0 var(--festive-gold);
+}
+[data-festive]:not([data-festive="classic"]) .rail-item.is-active:active {
+  background: var(--festive-accent);
+}
+[data-festive]:not([data-festive="classic"]) .rail-clock {
+  color: var(--festive-rail-ink);
+  border-top: 1px solid rgba(255, 255, 255, .14);
+}
+[data-festive]:not([data-festive="classic"]) .rail-clock.is-holding {
+  background: var(--festive-rail-hover);
+}
+[data-festive]:not([data-festive="classic"]) .rail-clock span {
+  color: var(--festive-gold);
+}
+[data-festive]:not([data-festive="classic"]) .update-dot {
+  background: var(--festive-gold);
+  box-shadow: 0 0 0 2px var(--festive-rail);
+}
+
+/* Home clock, holiday badge, and weather divider */
+[data-festive]:not([data-festive="classic"]) .h-clock,
+[data-festive]:not([data-festive="classic"]) .live-home-weather {
+  border-bottom: 3px solid var(--festive-accent);
+}
+[data-festive]:not([data-festive="classic"]) .h-ampm {
+  color: var(--festive-accent);
+}
+[data-festive]:not([data-festive="classic"]) .h-date {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+[data-festive]:not([data-festive="classic"]) .h-date b {
+  margin-right: 0;
+}
+[data-festive]:not([data-festive="classic"]) .festive-countdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--festive-pill-bg);
+  color: var(--festive-pill-ink);
+  border: 1px solid var(--festive-pill-border);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 800;
+  font-stretch: 80%;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+[data-festive]:not([data-festive="classic"]) .festive-countdown .i {
+  color: var(--festive-gold);
+}
+
+/* Cards & Home overview accents */
+[data-festive]:not([data-festive="classic"]) .card {
+  border: 1px solid var(--line);
+}
+[data-festive]:not([data-festive="classic"]) .live-home-overview .card:nth-child(1) {
+  border-left: 5px solid var(--festive-accent);
+}
+[data-festive]:not([data-festive="classic"]) .live-home-overview .card:nth-child(2) {
+  border-left: 5px solid var(--festive-accent-2);
+}
+[data-festive]:not([data-festive="classic"]) .live-home-overview .card:nth-child(3) {
+  border-left: 5px solid var(--festive-gold);
+}
+[data-festive]:not([data-festive="classic"]) .live-home-overview .card .label {
+  color: var(--festive-accent-2);
+}
+[data-festive]:not([data-festive="classic"]) .live-home-overview .card:nth-child(1) .label {
+  color: var(--festive-accent);
+}
+
+/* Buttons, chips, segments, calendar week */
+[data-festive]:not([data-festive="classic"]) .btn {
+  border-color: var(--ink);
+}
+[data-festive]:not([data-festive="classic"]) .btn--solid {
+  background: var(--festive-accent);
+  border-color: var(--festive-accent);
+  color: #FFFDF8;
+}
+[data-festive]:not([data-festive="classic"]) .seg button.is-on,
+[data-festive]:not([data-festive="classic"]) .chip.is-on,
+[data-festive]:not([data-festive="classic"]) .live-week button.is-on,
+[data-festive]:not([data-festive="classic"]) .live-shopping-check.is-done,
+[data-festive]:not([data-festive="classic"]) .s-tile.is-on,
+[data-festive]:not([data-festive="classic"]) .display-modes button.is-on,
+[data-festive]:not([data-festive="classic"]) .festive-modes button.is-on {
+  background: var(--festive-accent);
+  color: #FFFDF8;
+}
+
+/* Shopping, Lights, Weather, Chores */
+[data-festive]:not([data-festive="classic"]) .s-cat-h {
+  border-bottom: 2px solid var(--festive-accent);
+}
+[data-festive]:not([data-festive="classic"]) .live-shopping-add {
+  background: var(--card);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--festive-accent);
+}
+[data-festive]:not([data-festive="classic"]) .s-input-wrap {
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+[data-festive]:not([data-festive="classic"]) .usual-open {
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--festive-accent-2);
+}
+[data-festive]:not([data-festive="classic"]) .usual-product.is-added {
+  border-color: var(--festive-accent);
+}
+[data-festive]:not([data-festive="classic"]) .light-bar,
+[data-festive]:not([data-festive="classic"]) .light-color {
+  border: 1px solid var(--line);
+}
+[data-festive]:not([data-festive="classic"]) .light-line-fill {
+  background: var(--festive-glow);
+}
+[data-festive]:not([data-festive="classic"]) .forecast-day {
+  border-color: var(--line);
+}
+[data-festive]:not([data-festive="classic"]) .forecast-day.is-selected {
+  border-color: var(--festive-accent);
+  background: var(--paper-2);
+}
+[data-festive]:not([data-festive="classic"]) .forecast-detail {
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--festive-gold);
+}
+[data-festive]:not([data-festive="classic"]) .live-person-lane {
+  border: 1px solid var(--line);
+}
+
+/* Sheets, banners, toasts */
+[data-festive]:not([data-festive="classic"]) .sheet {
+  border: 2px solid var(--festive-gold);
+}
+[data-festive]:not([data-festive="classic"]) .sheet.sheet--usuals {
+  border: 0;
+}
+[data-festive]:not([data-festive="classic"]) .banner {
+  background: var(--festive-banner-bg);
+  color: var(--festive-banner-ink);
+}
+[data-festive]:not([data-festive="classic"]) .banner-btn--solid {
+  background: var(--festive-accent);
+  color: #FFFDF8;
+}
+[data-festive]:not([data-festive="classic"]) .toast {
+  background: var(--festive-rail);
+  color: #FFFDF8;
+  border: 1px solid var(--festive-gold);
+}
+[data-festive]:not([data-festive="classic"]) .toast--error {
+  background: var(--alert);
+  color: #FFFFFF;
+  border-color: transparent;
+}
+
+/* Ambient festive background & holiday badge */
+[data-festive="harvest"] .amb-live-background {
+  background: radial-gradient(ellipse at 72% 18%, #6B3614, #140B06 72%);
+}
+[data-festive="cranberry"] .amb-live-background {
+  background: radial-gradient(ellipse at 72% 18%, #5D1B22, #12080A 72%);
+}
+[data-festive="autumn"] .amb-live-background {
+  background: radial-gradient(ellipse at 72% 18%, #344D31, #0C120C 72%);
+}
+[data-festive]:not([data-festive="classic"]) .amb-festive {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: rgba(24, 15, 10, .58);
+  border: 1px solid rgba(240, 184, 77, .55);
+  color: #FAF1DF;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: .04em;
+}
+[data-festive]:not([data-festive="classic"]) .amb-festive .i {
+  color: #F2BE57;
+}
+
+/* ================================================================
+   Display Settings: Thanksgiving Theme Picker
+   ================================================================ */
+.sheet--display { width: 640px; }
+.display-section-label { margin: 22px 0 10px; }
+.festive-modes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.festive-modes button {
+  min-height: 78px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  background: var(--paper-2);
+  border: 2px solid transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 6px;
+  text-align: left;
+}
+.festive-modes button:active { opacity: .82; }
+.festive-modes button.is-on {
+  background: var(--ink);
+  color: var(--paper);
+}
+.festive-mode-top {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.festive-mode-top b { font-size: 21px; font-weight: 800; }
+.festive-modes small { font-size: 14px; opacity: .78; line-height: 1.2; }
+.festive-swatches { display: inline-flex; gap: 5px; flex: none; }
+.festive-swatches i {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, .55);
+}

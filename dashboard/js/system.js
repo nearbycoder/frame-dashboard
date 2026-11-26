@@ -22,9 +22,9 @@
 
   // ------------------------------------------------------------ display settings
   var FESTIVE_OPTIONS = [
-    { id: 'evergreen', name: 'Evergreen', sub: 'Pine, holly & gold', swatches: ['#123124', '#B82328', '#C48A24'] },
-    { id: 'hearth', name: 'Hearth', sub: 'Cranberry & fireplace', swatches: ['#5B141B', '#A91E24', '#E39324'] },
-    { id: 'frost', name: 'Winter Frost', sub: 'Midnight snow & berry', swatches: ['#132A42', '#3A8BC7', '#C93040'] },
+    { id: 'harvest', name: 'Harvest Gold', sub: 'Pumpkin, wheat & chestnut', swatches: ['#3B2010', '#C2531A', '#D19122'] },
+    { id: 'cranberry', name: 'Cranberry Cider', sub: 'Mulled berry & spiced amber', swatches: ['#54171D', '#9E2430', '#C98824'] },
+    { id: 'autumn', name: 'Autumn Sage', sub: 'Woodland sage & maple rust', swatches: ['#263626', '#B8521E', '#C49328'] },
     { id: 'classic', name: 'Classic', sub: 'Neutral year-round', swatches: ['#F2EEE6', '#17191D', '#7A756B'] }
   ];
   App.openDisplaySettings = function () {
@@ -33,7 +33,7 @@
       '<button data-mode="day" aria-pressed="' + (App.theme === 'light') + '" class="' + (App.theme === 'light' ? 'is-on' : '') + '">Light</button>' +
       '<button data-mode="dark" aria-pressed="' + (App.theme === 'dark') + '" class="' + (App.theme === 'dark' ? 'is-on' : '') + '">Dark</button>' +
       '<button data-mode="ambient">Ambient</button><button data-mode="night">Night</button></div>' +
-      '<div class="label display-section-label">Christmas theme</div>' +
+      '<div class="label display-section-label">Thanksgiving theme</div>' +
       '<div class="festive-modes">' + FESTIVE_OPTIONS.map(function (opt) {
         var on = App.festive === opt.id;
         return '<button data-festive="' + opt.id + '" aria-pressed="' + on + '" class="' + (on ? 'is-on' : '') + '">' +

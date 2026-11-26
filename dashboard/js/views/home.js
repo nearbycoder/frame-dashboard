@@ -4,7 +4,7 @@
  var H = App.household, D = window.DATA, V = { el: null };
  function clock() {
   var n = App.now();
-  var badge = App.festive !== 'classic' ? '<span class="festive-countdown">' + App.icon(App.festive === 'frost' ? 'snowflake' : 'tree', 16) + App.esc(App.christmasCountdown(n)) + '</span>' : '';
+  var badge = App.festive !== 'classic' ? '<span class="festive-countdown">' + App.icon('leaf', 16) + App.esc(App.thanksgivingLabel(n)) + '</span>' : '';
   return '<div class="h-time num">' + App.fmt.time(n, false) + '<span class="h-ampm">' + App.fmt.ampm(n) + '</span></div><div class="h-date"><span><b>' + App.fmt.day(n) + '</b> ' + App.fmt.month(n) + ' ' + n.getDate() + '</span>' + badge + '</div><p class="live-note">' + (H.clock ? 'Ring MCP · Central time' : 'Device clock · Central time') + '</p>' + H.statusHTML('time');
  }
  function weather() {
