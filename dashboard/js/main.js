@@ -2,6 +2,7 @@
 import './icons.js';
 import './data.js';
 import './app.js';
+import './thanksgiving-art.js';
 import './lights.js';
 import './household.js';
 import './system.js';
